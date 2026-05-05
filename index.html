@@ -3,6 +3,154 @@
 <head>
   <title>Support Process Finder</title>
   <style>
+    body {
+      font-family: Arial;
+      margin: 20px;
+      background: #f5f6fa;
+    }
+
+    h2 {
+      color: #2f3640;
+    }
+
+    input {
+      padding: 10px;
+      width: 300px;
+      margin: 10px 0;
+    }
+
+    .buttons {
+      margin: 10px 0;
+    }
+
+    .buttons button {
+      padding: 8px 12px;
+      margin: 3px;
+      border: none;
+      background: #40739e;
+      color: white;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .buttons button:hover {
+      background: #273c75;
+    }
+
+    .card {
+      background: white;
+      border-radius: 6px;
+      padding: 15px;
+      margin-top: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .title {
+      font-weight: bold;
+      color: #192a56;
+    }
+
+    .meta {
+      font-size: 13px;
+      color: #718093;
+    }
+
+    pre {
+      background: #f1f2f6;
+      padding: 10px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+
+<h2>🔧 Support Process Finder</h2>
+
+<input type="text" id="search" placeholder="Search issue, keyword...">
+
+<div class="buttons">
+  <button onclick="filterCategory('')">All</button>
+  <button onclick="filterCategory('Contract')">Contract</button>
+  <button onclick="filterCategory('Location')">Location</button>
+  <button onclick="filterCategory('Customer')">Customer</button>
+  <button onclick="filterCategory('Machine Type')">Machine Type</button>
+  <button onclick="filterCategory('Part')">Part</button>
+  <button onclick="filterCategory('Logistics')">Logistics</button>
+  <button onclick="filterCategory('Special Handling')">Special</button>
+</div>
+
+<div id="results"></div>
+
+<script>
+const DATA_URL = "https://raw.githubusercontent.com/yourname/support-processes/main/process.json";
+
+let data = [];
+let currentCategory = "";
+
+// Load data
+async function loadData() {
+  const res = await fetch(DATA_URL);
+  data = await res.json();
+  display(data);
+}
+
+// Filter by category
+function filterCategory(cat) {
+  currentCategory = cat;
+  search();
+}
+
+// Search + filter
+function search() {
+  const keyword = document.getElementById("search").value.toLowerCase();
+
+  const results = data.filter(item =>
+    (!keyword ||
+      item.issue.toLowerCase().includes(keyword) ||
+      item.process.toLowerCase().includes(keyword)
+    ) &&
+    (!currentCategory || item.category === currentCategory)
+  );
+
+  display(results);
+}
+
+// Display results
+function display(results) {
+  const container = document.getElementById("results");
+  container.innerHTML = "";
+
+  if (!results.length) {
+    container.innerHTML = "<p>No results found</p>";
+    return;
+  }
+
+  results.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <div class="title">${item.issue}</div>
+      <div class="meta">${item.category} | ${item.machine_type}</div>
+      <pre>${item.process}</pre>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+// Live search
+document.getElementById("search").addEventListener("input", search);
+
+loadData();
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+  <title>Support Process Finder</title>
+  <style>
     body { font-family: Arial; margin: 20px; }
     input, select, button { padding: 8px; margin: 5px; }
     .card { border: 1px solid #ddd; padding: 10px; margin-top: 10px; }
