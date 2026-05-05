@@ -1,0 +1,11 @@
+[
+  {
+    "id": 1,
+    "category": "Server",
+    "machine_type": "SR630",
+    "customer": "Internal",
+    "issue": "SNMPv3 Setup",
+    "keywords": ["snmp", "monitoring"],
+    "process": "1. Access XCC\n2. Configure SNMPv3...\n3. Test connectivity"
+  }
+]
