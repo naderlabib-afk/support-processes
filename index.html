@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Support Process Finder</title>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    input, select, button { padding: 8px; margin: 5px; }
+    .card { border: 1px solid #ddd; padding: 10px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<h2>Support Process Finder</h2>
+
+<input type="text" id="search" placeholder="Search issue or keyword">
+<select id="category">
+  <option value="">All Categories</option>
+  <option value="Server">Server</option>
+  <option value="Workstation">Workstation</option>
+</select>
+
+<button onclick="search()">Search</button>
+
+<div id="results"></div>
+
+<script>
+const DATA_URL = "https://raw.githubusercontent.com/naderlabib-afk/support-processes/refs/heads/main/processes.json";
+
+let data = [];
+
+// Load data
+async function loadData() {
+  try {
+    const res = await fetch(DATA_URL);
+    data = await res.json();
+  } catch (err) {
+    document.getElementById("results").innerHTML = "Error loading data";
+  }
+}
+
+function search() {
+  const keyword = document.getElementById("search").value.toLowerCase();
+  const category = document.getElementById("category").value;
+
+  const results = data.filter(item =>
+    (!keyword ||
+      item.issue.toLowerCase().includes(keyword) ||
+      item.keywords.join(" ").toLowerCase().includes(keyword)
+    ) &&
+    (!category || item.category === category)
+  );
+
+  display(results);
+}
+
+function display(results) {
+  const container = document.getElementById("results");
+  container.innerHTML = "";
+
+  if (!results.length) {
+    container.innerHTML = "<p>No results found</p>";
+    return;
+  }
+
+  results.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <b>${item.machine_type} - ${item.issue}</b><br>
+      <i>Customer: ${item.customer}</i><br><br>
+      <pre>${item.process}</pre>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+loadData();
+</script>
+
+</body>
+</html>
