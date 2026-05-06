@@ -81,8 +81,10 @@
 <div id="results"></div>
 
 <script>
-const DATA_URL = "https://raw.githubusercontent.com/naderlabib-afk/support-processes/refs/heads/main/processes.json
-";
+function getDataUrl() {
+  return `https://raw.githubusercontent.com/naderlabib-afk/support-processes/refs/heads/main/processes.json?t=${new Date().getTime()}`;
+}
+  
 
 let data = [];
 let currentCategory = "";
@@ -90,7 +92,7 @@ let suggestionIndex = -1;
 
 // Load data
 async function loadData() {
-  const res = await fetch(DATA_URL);
+  const res = await fetch(getDataUrl());
   data = await res.json();
   display(data);
 }
@@ -325,14 +327,16 @@ loadData();
 <div id="results"></div>
 
 <script>
-const DATA_URL = "https://raw.githubusercontent.com/naderlabib-afk/support-processes/refs/heads/main/processes.json";
+function getDataUrl() {
+  return `https://raw.githubusercontent.com/naderlabib-afk/support-processes/refs/heads/main/processes.json?t=${new Date().getTime()}`;
+}
 
 let data = [];
 let currentCategory = "";
 
 // Load data
 async function loadData() {
-  const res = await fetch(DATA_URL);
+  const res = await fetch(getDataUrl());
   data = await res.json();
   display(data);
 }
@@ -415,18 +419,17 @@ loadData();
 <div id="results"></div>
 
 <script>
-const DATA_URL = "https://raw.githubusercontent.com/naderlabib-afk/support-processes/refs/heads/main/processes.json";
+function getDataUrl() {
+  return `https://raw.githubusercontent.com/naderlabib-afk/support-processes/refs/heads/main/processes.json?t=${new Date().getTime()}`;
+}
 
 let data = [];
 
 // Load data
 async function loadData() {
-  try {
-    const res = await fetch(DATA_URL);
-    data = await res.json();
-  } catch (err) {
-    document.getElementById("results").innerHTML = "Error loading data";
-  }
+  const res = await fetch(getDataUrl());
+  data = await res.json();
+  display(data);
 }
 
 function search() {
