@@ -1,96 +1,197 @@
 <!DOCTYPE html>
-</> JavaScript
-setInterval(loadData, 30000); // refresh every 30 seconds
 <html>
 <head>
   <title>Support Process Finder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <style>
-    body { font-family: Arial; margin: 20px; background: #f5f6fa; }
-    h2 { color: #2f3640; }
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      margin: 0;
+      background: #eef2f7;
+      color: #2f3640;
+    }
+
+    header {
+      background: #273c75;
+      color: white;
+      padding: 15px 25px;
+      font-size: 20px;
+      font-weight: bold;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
 
     .search-box {
       position: relative;
-      width: 350px;
+      margin-bottom: 15px;
     }
 
     input {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
     }
 
     .suggestions {
       position: absolute;
-      background: white;
-      border: 1px solid #ccc;
       width: 100%;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      margin-top: 3px;
       max-height: 200px;
       overflow-y: auto;
-      z-index: 100;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 
     .suggestion {
-      padding: 8px;
+      padding: 10px;
       cursor: pointer;
     }
 
-    .suggestion:hover, .active {
-      background: #dcdde1;
+    .suggestion:hover {
+      background: #f1f2f6;
+    }
+
+    .buttons {
+      margin-bottom: 15px;
     }
 
     .buttons button {
-      margin: 5px;
-      padding: 8px;
+      padding: 8px 14px;
+      margin: 4px;
+      border-radius: 20px;
+      border: none;
       background: #40739e;
       color: white;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .buttons button:hover {
+      background: #273c75;
+    }
+
+    .refresh {
+      margin-bottom: 15px;
+    }
+
+    .refresh button {
+      padding: 6px 12px;
+      border-radius: 6px;
       border: none;
+      background: #44bd32;
+      color: white;
       cursor: pointer;
     }
 
     .card {
       background: white;
-      padding: 15px;
-      margin-top: 10px;
+      padding: 18px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+    }
+
+    .title {
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 5px;
+    }
+
+    .meta {
+      font-size: 12px;
+      color: #718093;
+      margin-bottom: 10px;
+    }
+
+    .actions {
+      margin-bottom: 10px;
+    }
+
+    .actions button {
+      padding: 6px 10px;
+      margin-right: 5px;
       border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .email-btn {
+      background: #0097e6;
+      color: white;
+    }
+
+    .copy-btn {
+      background: #8c7ae6;
+      color: white;
     }
 
     pre {
-      background: #f1f2f6;
+      background: #f5f6fa;
       padding: 10px;
+      border-radius: 6px;
       white-space: pre-wrap;
+      font-size: 13px;
     }
 
-    mark { background: yellow; }
+    mark {
+      background: #ffeaa7;
+    }
   </style>
 </head>
+
 <body>
 
-<h2>🔍 Support Process Finder</h2>
+<header>🔧 Support Process Finder</header>
 
-<div class="search-box">
-  <input type="text" id="search" placeholder="Search issue, contract, GPU...">
-  <div id="suggestions" class="suggestions"></div>
+<div class="container">
+
+  <div class="search-box">
+    <input type="text" id="search" placeholder="Search issue, contract, GPU...">
+    <div id="suggestions" class="suggestions"></div>
+  </div>
+
+  <div class="buttons">
+    <button onclick="filterCategory('')">All</button>
+    <button onclick="filterCategory('Contract')">Contract</button>
+    <button onclick="filterCategory('Location')">Location</button>
+    <button onclick="filterCategory('Customer')">Customer</button>
+    <button onclick="filterCategory('Machine Type')">Machine</button>
+    <button onclick="filterCategory('Part')">Part</button>
+  </div>
+
+  <div class="refresh">
+    <button onclick="loadData()">🔄 Refresh</button>
+  </div>
+
+  <div id="results"></div>
+
 </div>
-
-<div class="buttons">
-  <button onclick="filterCategory('')">All</button>
-  <button onclick="filterCategory('Contract')">Contract</button>
-  <button onclick="filterCategory('Location')">Location</button>
-  <button onclick="filterCategory('Customer')">Customer</button>
-  <button onclick="filterCategory('Machine Type')">Machine</button>
-  <button onclick="filterCategory('Part')">Part</button>
-</div>
-
-<div id="results"></div>
 
 <script>
 function getDataUrl() {
   return `https://raw.githubusercontent.com/naderlabib-afk/support-processes/refs/heads/main/processes.json?t=${new Date().getTime()}`;
 }
-  
 
 let data = [];
 let currentCategory = "";
-let suggestionIndex = -1;
 
 // Load data
 async function loadData() {
@@ -99,25 +200,25 @@ async function loadData() {
   display(data);
 }
 
-// Extract suggestion pool
+
+
+// Suggestions
 function getSuggestions(keyword) {
   const set = new Set();
 
   data.forEach(item => {
     if (item.issue.toLowerCase().includes(keyword)) set.add(item.issue);
     if (item.category.toLowerCase().includes(keyword)) set.add(item.category);
-    if (item.machine_type.toLowerCase().includes(keyword)) set.add(item.machine_type);
   });
 
-  return Array.from(set).slice(0, 8);
+  return Array.from(set).slice(0, 6);
 }
 
-// Show suggestions
 function showSuggestions(list) {
   const container = document.getElementById("suggestions");
   container.innerHTML = "";
 
-  list.forEach((text, index) => {
+  list.forEach(text => {
     const div = document.createElement("div");
     div.className = "suggestion";
     div.innerText = text;
@@ -132,34 +233,17 @@ function showSuggestions(list) {
   });
 }
 
-// Smart search
+// Search
 function search() {
   const keyword = document.getElementById("search").value.toLowerCase().trim();
 
-  let results = data.map(item => {
-    let score = 0;
-
-    const issue = item.issue.toLowerCase();
-    const process = item.process.toLowerCase();
-
-    if (keyword) {
-      if (issue === keyword) score += 100;
-      else if (issue.startsWith(keyword)) score += 70;
-      else if (issue.includes(keyword)) score += 50;
-
-      if (process.includes(keyword)) score += 10;
-    }
-
-    if (currentCategory && item.category !== currentCategory) {
-      score = 0;
-    }
-
-    return { ...item, score };
-  });
-
-  if (keyword) results = results.filter(r => r.score > 0);
-
-  results.sort((a, b) => b.score - a.score);
+  let results = data.filter(item =>
+    (!keyword ||
+      item.issue.toLowerCase().includes(keyword) ||
+      item.process.toLowerCase().includes(keyword)
+    ) &&
+    (!currentCategory || item.category === currentCategory)
+  );
 
   display(results);
 }
@@ -167,8 +251,7 @@ function search() {
 // Highlight
 function highlight(text, keyword) {
   if (!keyword) return text;
-  const regex = new RegExp(`(${keyword})`, "gi");
-  return text.replace(regex, "<mark>$1</mark>");
+  return text.replace(new RegExp(`(${keyword})`, "gi"), "<mark>$1</mark>");
 }
 
 // Display
@@ -188,26 +271,47 @@ function display(results) {
     div.className = "card";
 
     div.innerHTML = `
-      <b>${highlight(item.issue, keyword)}</b><br>
-      <i>${item.category} | ${item.machine_type}</i>
+      <div class="title">${highlight(item.issue, keyword)}</div>
+      <div class="meta">${item.category} | ${item.machine_type}</div>
+
+      <div class="actions">
+        <button class="email-btn" onclick="shareEmail('${encodeURIComponent(item.issue)}')">📧 Email</button>
+        <button class="copy-btn" onclick="copyProcess(\`${item.process}\`)">📋 Copy</button>
+      </div>
+
       <pre>${highlight(item.process, keyword)}</pre>
     `;
-<div style="margin-top:5px;">
-    <button onclick="shareLink('${encodeURIComponent(item.issue)}')">🔗 Copy Link</button>
-    <button onclick="shareEmail('${encodeURIComponent(item.issue)}')">📧 Email</button>
-  </div>
-    
+
     container.appendChild(div);
   });
 }
 
-// Category filter
+// Email
+function shareEmail(issueEncoded) {
+  const issue = decodeURIComponent(issueEncoded);
+  const item = data.find(d => d.issue === issue);
+  if (!item) return;
+
+  const subject = `Support Process: ${item.issue}`;
+  const body = `Process:\n\n${item.process}`;
+
+  window.location.href =
+    `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+// Copy
+function copyProcess(text) {
+  navigator.clipboard.writeText(text);
+  alert("📋 Process copied!");
+}
+
+// Filter
 function filterCategory(cat) {
   currentCategory = cat;
   search();
 }
 
-// Input event
+// Events
 document.getElementById("search").addEventListener("input", function() {
   const keyword = this.value.toLowerCase();
 
@@ -217,271 +321,9 @@ document.getElementById("search").addEventListener("input", function() {
     return;
   }
 
-  const suggestions = getSuggestions(keyword);
-  showSuggestions(suggestions);
+  showSuggestions(getSuggestions(keyword));
   search();
 });
-
-// Keyboard navigation
-document.getElementById("search").addEventListener("keydown", function(e) {
-  const items = document.querySelectorAll(".suggestion");
-
-  if (e.key === "ArrowDown") {
-    suggestionIndex++;
-  } else if (e.key === "ArrowUp") {
-    suggestionIndex--;
-  } else if (e.key === "Enter" && suggestionIndex >= 0) {
-    this.value = items[suggestionIndex].innerText;
-    document.getElementById("suggestions").innerHTML = "";
-    search();
-    suggestionIndex = -1;
-    return;
-  }
-
-  items.forEach(i => i.classList.remove("active"));
-
-  if (items[suggestionIndex]) {
-    items[suggestionIndex].classList.add("active");
-  }
-});
-
-loadData();
-</script>
-
-</body>
-</html><!DOCTYPE html>
-<html>
-<head>
-  <title>Support Process Finder</title>
-  <style>
-    body {
-      font-family: Arial;
-      margin: 20px;
-      background: #f5f6fa;
-    }
-
-    h2 {
-      color: #2f3640;
-    }
-
-    input {
-      padding: 10px;
-      width: 300px;
-      margin: 10px 0;
-    }
-
-    .buttons {
-      margin: 10px 0;
-    }
-
-    .buttons button {
-      padding: 8px 12px;
-      margin: 3px;
-      border: none;
-      background: #40739e;
-      color: white;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-
-    .buttons button:hover {
-      background: #273c75;
-    }
-
-    .card {
-      background: white;
-      border-radius: 6px;
-      padding: 15px;
-      margin-top: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    .title {
-      font-weight: bold;
-      color: #192a56;
-    }
-
-    .meta {
-      font-size: 13px;
-      color: #718093;
-    }
-
-    pre {
-      background: #f1f2f6;
-      padding: 10px;
-      white-space: pre-wrap;
-    }
-  </style>
-</head>
-<body>
-
-<h2>🔧 Support Process Finder</h2>
-
-<input type="text" id="search" placeholder="Search issue, keyword...">
-
-<div class="buttons">
-  <button onclick="filterCategory('')">All</button>
-  <button onclick="filterCategory('Contract')">Contract</button>
-  <button onclick="filterCategory('Location')">Location</button>
-  <button onclick="filterCategory('Customer')">Customer</button>
-  <button onclick="filterCategory('Machine Type')">Machine Type</button>
-  <button onclick="filterCategory('Part')">Part</button>
-  <button onclick="filterCategory('Logistics')">Logistics</button>
-  <button onclick="filterCategory('Special Handling')">Special</button>
-</div>
-
-<div id="results"></div>
-
-<script>
-function getDataUrl() {
-  return `https://raw.githubusercontent.com/naderlabib-afk/support-processes/refs/heads/main/processes.json?t=${new Date().getTime()}`;
-}
-
-let data = [];
-let currentCategory = "";
-
-// Load data
-async function loadData() {
-  const res = await fetch(getDataUrl());
-  data = await res.json();
-  display(data);
-}
-
-// Filter by category
-function filterCategory(cat) {
-  currentCategory = cat;
-  search();
-}
-
-// Search + filter
-function search() {
-  const keyword = document.getElementById("search").value.toLowerCase();
-
-  const results = data.filter(item =>
-    (!keyword ||
-      item.issue.toLowerCase().includes(keyword) ||
-      item.process.toLowerCase().includes(keyword)
-    ) &&
-    (!currentCategory || item.category === currentCategory)
-  );
-
-  display(results);
-}
-
-// Display results
-function display(results) {
-  const container = document.getElementById("results");
-  container.innerHTML = "";
-
-  if (!results.length) {
-    container.innerHTML = "<p>No results found</p>";
-    return;
-  }
-
-  results.forEach(item => {
-    const div = document.createElement("div");
-    div.className = "card";
-
-    div.innerHTML = `
-      <div class="title">${item.issue}</div>
-      <div class="meta">${item.category} | ${item.machine_type}</div>
-      <pre>${item.process}</pre>
-    `;
-<div style="margin-top:5px;">
-    <button onclick="shareLink('${encodeURIComponent(item.issue)}')">🔗 Copy Link</button>
-    <button onclick="shareEmail('${encodeURIComponent(item.issue)}')">📧 Email</button>
-  </div>
-    
-    container.appendChild(div);
-  });
-}
-
-// Live search
-document.getElementById("search").addEventListener("input", search);
-
-loadData();
-</script>
-
-</body>
-</html><!DOCTYPE html>
-<html>
-<head>
-  <title>Support Process Finder</title>
-  <style>
-    body { font-family: Arial; margin: 20px; }
-    input, select, button { padding: 8px; margin: 5px; }
-    .card { border: 1px solid #ddd; padding: 10px; margin-top: 10px; }
-  </style>
-</head>
-<body>
-
-<h2>Support Process Finder</h2>
-
-<input type="text" id="search" placeholder="Search issue or keyword">
-<select id="category">
-  <option value="">All Categories</option>
-  <option value="Server">Server</option>
-  <option value="Workstation">Workstation</option>
-</select>
-
-<button onclick="search()">Search</button>
-
-<div id="results"></div>
-
-<script>
-function getDataUrl() {
-  return `https://raw.githubusercontent.com/naderlabib-afk/support-processes/refs/heads/main/processes.json?t=${new Date().getTime()}`;
-}
-
-let data = [];
-
-// Load data
-async function loadData() {
-  const res = await fetch(getDataUrl());
-  data = await res.json();
-  display(data);
-}
-
-function search() {
-  const keyword = document.getElementById("search").value.toLowerCase();
-  const category = document.getElementById("category").value;
-
-  const results = data.filter(item =>
-    (!keyword ||
-      item.issue.toLowerCase().includes(keyword) ||
-      item.keywords.join(" ").toLowerCase().includes(keyword)
-    ) &&
-    (!category || item.category === category)
-  );
-
-  display(results);
-}
-
-function display(results) {
-  const container = document.getElementById("results");
-  container.innerHTML = "";
-
-  if (!results.length) {
-    container.innerHTML = "<p>No results found</p>";
-    return;
-  }
-
-  results.forEach(item => {
-    const div = document.createElement("div");
-    div.className = "card";
-
-    div.innerHTML = `
-      <b>${item.machine_type} - ${item.issue}</b><br>
-      <i>Customer: ${item.customer}</i><br><br>
-      <pre>${item.process}</pre>
-    `;
-<div style="margin-top:5px;">
-    <button onclick="shareLink('${encodeURIComponent(item.issue)}')">🔗 Copy Link</button>
-    <button onclick="shareEmail('${encodeURIComponent(item.issue)}')">📧 Email</button>
-  </div>
-    container.appendChild(div);
-  });
-}
 
 loadData();
 </script>
