@@ -1,32 +1,5 @@
 <!DOCTYPE html>
 <html>
-<button onclick="toggleAdmin()" style="margin:10px;">🔐 Admin</button>
-<div id="adminPanel" style="display:none; background:#fff; padding:15px; margin:20px; border-radius:10px;">
-  <h3>Admin Panel</h3>
-
-  <input id="adminPass" type="password" placeholder="Enter password">
-  <button onclick="unlockAdmin()">Unlock</button>
-
-  <div id="adminContent" style="display:none; margin-top:15px;">
-
-    <h4>Add / Edit Process</h4>
-
-    <input id="cat" placeholder="Category"><br><br>
-    <input id="machine" placeholder="Machine Type"><br><br>
-    <input id="issue" placeholder="Issue"><br><br>
-    <textarea id="process" placeholder="Process steps..." style="width:100%; height:100px;"></textarea><br><br>
-
-    <button onclick="saveProcess()">💾 Save</button>
-    <button onclick="clearForm()">Clear</button>
-
-    <h4>All Processes</h4>
-    <div id="adminList"></div>
-
-    <button onclick="downloadJSON()">⬇ Download JSON</button>
-
-  </div>
-</div>
-
 <head>
   <title>Process Finder</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -36,7 +9,6 @@
       --bg: #eef2f7;
       --card: white;
       --text: #2f3640;
-      --primary: #273c75;
       --accent: #40739e;
     }
 
@@ -44,7 +16,6 @@
       --bg: #1e272e;
       --card: #2f3640;
       --text: #f5f6fa;
-      --primary: #487eb0;
       --accent: #00a8ff;
     }
 
@@ -57,14 +28,11 @@
     }
 
     header {
-      backdrop-filter: blur(10px);
       background: rgba(39,60,117,0.9);
       color: white;
       padding: 15px 20px;
-      font-weight: bold;
       display: flex;
       justify-content: space-between;
-      align-items: center;
       position: sticky;
       top: 0;
     }
@@ -75,10 +43,10 @@
       padding: 20px;
     }
 
-    input {
+    input, textarea {
       width: 100%;
-      padding: 12px;
-      border-radius: 10px;
+      padding: 10px;
+      border-radius: 8px;
       border: none;
       margin-bottom: 10px;
     }
@@ -95,27 +63,14 @@
 
     .card {
       background: var(--card);
-      padding: 18px;
-      border-radius: 12px;
-      margin-bottom: 15px;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 12px;
       box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-      transition: 0.2s;
     }
 
-    .card:hover {
-      transform: translateY(-3px);
-    }
-
-    .title {
-      font-weight: bold;
-      font-size: 16px;
-    }
-
-    .meta {
-      font-size: 12px;
-      opacity: 0.7;
-      margin-bottom: 10px;
-    }
+    .title { font-weight: bold; }
+    .meta { font-size: 12px; opacity: 0.7; margin-bottom: 8px; }
 
     .actions button {
       margin-right: 5px;
@@ -123,11 +78,28 @@
       border-radius: 6px;
       border: none;
       cursor: pointer;
+      position: relative;
     }
 
     .email { background: #00a8ff; color: white; }
     .copy { background: #9c88ff; color: white; }
     .fav { background: #fbc531; }
+
+    /* TOOLTIP */
+    .actions button:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.85);
+      color: white;
+      padding: 5px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      white-space: nowrap;
+      z-index: 10;
+    }
 
     pre {
       background: rgba(0,0,0,0.05);
@@ -142,28 +114,13 @@
       right: 20px;
       background: black;
       color: white;
-      padding: 10px 15px;
+      padding: 10px;
       border-radius: 8px;
       opacity: 0;
       transition: 0.3s;
     }
 
-    .toast.show {
-      opacity: 1;
-    }
-
-    .topbar {
-      display: flex;
-      gap: 10px;
-    }
-
-    .toggle {
-      cursor: pointer;
-      background: white;
-      border-radius: 20px;
-      padding: 5px 10px;
-      color: black;
-    }
+    .toast.show { opacity: 1; }
   </style>
 </head>
 
@@ -171,14 +128,12 @@
 
 <header>
   🔧 Process Finder
-  <div class="topbar">
-    <div class="toggle" onclick="toggleTheme()">🌙</div>
-  </div>
+  <button onclick="toggleTheme()">🌙</button>
 </header>
 
 <div class="container">
 
-<input type="text" id="search" placeholder="Search anything...">
+<input type="text" id="search" placeholder="Search...">
 
 <div class="buttons">
   <button onclick="filterCategory('')">All</button>
@@ -186,9 +141,6 @@
   <button onclick="filterCategory('Location')">Location</button>
   <button onclick="filterCategory('Customer')">Customer</button>
   <button onclick="filterCategory('Machine Type')">Machine</button>
-  <button onclick="filterCategory('Part')">Part</button>
-  <button onclick="filterCategory('Special Handling')">Special</button>
-  <button onclick="filterCategory('Logistics')">Logistics</button>
 </div>
 
 <h3>⭐ Favorites</h3>
@@ -196,38 +148,67 @@
 
 <div id="results"></div>
 
+<hr>
+
+<!-- ADMIN -->
+<button onclick="toggleAdmin()">🔐 Admin</button>
+
+<div id="adminPanel" style="display:none; background:#fff; padding:15px; margin-top:10px; border-radius:10px;">
+  <h3>Admin Panel</h3>
+
+  <input id="adminPass" type="password" placeholder="Enter password">
+  <button onclick="unlockAdmin()">Unlock</button>
+
+  <div id="adminContent" style="display:none; margin-top:10px;">
+
+    <input id="cat" placeholder="Category">
+    <input id="machine" placeholder="Machine Type">
+    <input id="issue" placeholder="Issue">
+    <textarea id="process" placeholder="Process"></textarea>
+
+    <button onclick="saveProcess()">💾 Save</button>
+    <button onclick="clearForm()">Clear</button>
+
+    <h4>All Processes</h4>
+    <div id="adminList"></div>
+
+    <button onclick="downloadJSON()">⬇ Download JSON</button>
+  </div>
+</div>
+
 </div>
 
 <div id="toast" class="toast"></div>
 
 <script>
 
-const ADMIN_PASSWORD = "1234"; // change this
+const ADMIN_PASSWORD = "1234";
+
+let data = [];
+let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+let currentCategory = "";
 let editIndex = null;
 
-// Show panel
+/* ================= ADMIN ================= */
+
 function toggleAdmin() {
-  const panel = document.getElementById("adminPanel");
-  panel.style.display = panel.style.display === "none" ? "block" : "none";
+  const p = document.getElementById("adminPanel");
+  p.style.display = p.style.display === "none" ? "block" : "none";
 }
 
-// Unlock
 function unlockAdmin() {
   if (document.getElementById("adminPass").value === ADMIN_PASSWORD) {
     document.getElementById("adminContent").style.display = "block";
     renderAdminList();
-  } else {
-    alert("Wrong password");
-  }
+  } else alert("Wrong password");
 }
 
-// Save process
 function saveProcess() {
   const item = {
-    category: document.getElementById("cat").value,
-    machine_type: document.getElementById("machine").value,
-    issue: document.getElementById("issue").value,
-    process: document.getElementById("process").value
+    category: cat.value,
+    machine_type: machine.value,
+    issue: issue.value,
+    process: process.value
   };
 
   if (!item.issue) return alert("Issue required");
@@ -239,194 +220,167 @@ function saveProcess() {
     data.push(item);
   }
 
-  render();
+  applyFilters();
   renderAdminList();
   clearForm();
 }
 
-// Edit
-function editProcess(index) {
-  const item = data[index];
-  document.getElementById("cat").value = item.category;
-  document.getElementById("machine").value = item.machine_type;
-  document.getElementById("issue").value = item.issue;
-  document.getElementById("process").value = item.process;
-
-  editIndex = index;
+function editProcess(i) {
+  const d = data[i];
+  cat.value = d.category;
+  machine.value = d.machine_type;
+  issue.value = d.issue;
+  process.value = d.process;
+  editIndex = i;
 }
 
-// Delete
-function deleteProcess(index) {
-  if (!confirm("Delete this process?")) return;
-  data.splice(index, 1);
-  render();
+function deleteProcess(i) {
+  data.splice(i,1);
+  applyFilters();
   renderAdminList();
 }
 
-// Render admin list
 function renderAdminList() {
-  const container = document.getElementById("adminList");
-  container.innerHTML = "";
-
-  data.forEach((item, index) => {
-    container.innerHTML += `
-      <div style="border-bottom:1px solid #ccc; padding:5px;">
-        <b>${item.issue}</b>
-        <button onclick="editProcess(${index})">✏️</button>
-        <button onclick="deleteProcess(${index})">❌</button>
-      </div>
-    `;
+  const c = document.getElementById("adminList");
+  c.innerHTML = "";
+  data.forEach((d,i)=>{
+    c.innerHTML += `
+      <div>
+        <b>${d.issue}</b>
+        <button onclick="editProcess(${i})">✏️</button>
+        <button onclick="deleteProcess(${i})">❌</button>
+      </div>`;
   });
 }
 
-// Clear form
-function clearForm() {
-  ["cat","machine","issue","process"].forEach(id => document.getElementById(id).value = "");
-  editIndex = null;
+function clearForm(){
+  cat.value = machine.value = issue.value = process.value = "";
 }
 
-// Download JSON
-function downloadJSON() {
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
+/* ================= SEARCH CORE FIX ================= */
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "processes.json";
-  a.click();
+document.getElementById("search").addEventListener("input", applyFilters);
 
-  URL.revokeObjectURL(url);
-}
-function getDataUrl() {
-  return `https://raw.githubusercontent.com/naderlabib-afk/support-processes/refs/heads/main/processes.json?t=${new Date().getTime()}`;
-}
-
-let data = [];
-let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
-let currentCategory = "";
-
-// Load
-async function loadData() {
-  const res = await fetch(getDataUrl());
-  data = await res.json();
-  render();
-}
-
-setInterval(loadData, 30000);
-
-// Render
-function render() {
-  search(); // ensures filtering + search apply
-  displayFavorites();
-}
-
-// Search
-document.getElementById("search").addEventListener("input", search);
-
-function search() {
+function applyFilters() {
   const k = document.getElementById("search").value.toLowerCase();
 
-  const results = data.filter(i =>
-    (!k ||
+  const filtered = data.filter(i => {
+    const matchSearch =
+      !k ||
       i.issue.toLowerCase().includes(k) ||
       i.process.toLowerCase().includes(k) ||
       i.category.toLowerCase().includes(k) ||
-      i.machine_type.toLowerCase().includes(k)
-    ) &&
-    (!currentCategory || i.category === currentCategory)
-  );
+      i.machine_type.toLowerCase().includes(k);
 
-  display(results);
+    const matchCat =
+      !currentCategory || i.category === currentCategory;
+
+    return matchSearch && matchCat;
+  });
+
+  renderList(filtered);
+  renderFavorites();
 }
 
-// Display
-function display(list) {
-  const container = document.getElementById("results");
-  container.innerHTML = "";
+function renderList(list) {
+  const r = document.getElementById("results");
+  r.innerHTML = "";
 
   if (!list.length) {
-    container.innerHTML = "<p>No results found</p>";
+    r.innerHTML = "<p>No results found</p>";
     return;
   }
 
-  list.slice(0,15).forEach(item => {
-    container.innerHTML += `
+  list.slice(0,15).forEach(i=>{
+    r.innerHTML += `
       <div class="card">
-        <div class="title">${item.issue}</div>
-        <div class="meta">${item.category} | ${item.machine_type}</div>
+        <div class="title">${i.issue}</div>
+        <div class="meta">${i.category} | ${i.machine_type}</div>
 
         <div class="actions">
-          <button class="email" onclick="email('${encodeURIComponent(item.issue)}')">📤</button>
-          <button class="copy" onclick="copy(\`${item.process}\`)">📋</button>
-          <button class="fav" onclick="toggleFav('${item.issue}')">⭐</button>
+          <button class="email" data-tooltip="Share by email"
+            onclick="email('${encodeURIComponent(i.issue)}')">📤</button>
+
+          <button class="copy" data-tooltip="Copy process"
+            onclick="copy(\`${i.process}\`)">📋</button>
+
+          <button class="fav" data-tooltip="Favorite"
+            onclick="toggleFav('${i.issue}')">⭐</button>
         </div>
 
-        <pre>${item.process}</pre>
-      </div>
-    `;
+        <pre>${i.process}</pre>
+      </div>`;
   });
 }
 
-// Favorites
-function toggleFav(issue) {
-  if (favorites.includes(issue))
-    favorites = favorites.filter(f => f !== issue);
-  else
-    favorites.push(issue);
+/* ================= FAVORITES ================= */
+
+function toggleFav(issue){
+  if(favorites.includes(issue))
+    favorites = favorites.filter(f=>f!==issue);
+  else favorites.push(issue);
 
   localStorage.setItem("favorites", JSON.stringify(favorites));
-  showToast("Favorites updated");
-  displayFavorites();
+  applyFilters();
 }
 
-function displayFavorites() {
-  const container = document.getElementById("favorites");
-  container.innerHTML = "";
+function renderFavorites(){
+  const c = document.getElementById("favorites");
+  c.innerHTML = "";
 
-  favorites.forEach(f => {
-    const item = data.find(d => d.issue === f);
-    if (item) {
-      container.innerHTML += `<div class="card"><b>${item.issue}</b></div>`;
-    }
+  favorites.forEach(f=>{
+    const i = data.find(d=>d.issue===f);
+    if(i) c.innerHTML += `<div class="card">${i.issue}</div>`;
   });
 }
 
-// Email
-function email(issueEncoded) {
-  const issue = decodeURIComponent(issueEncoded);
-  const item = data.find(d => d.issue === issue);
+/* ================= OTHER ================= */
 
-  window.location.href =
-    `mailto:?subject=${encodeURIComponent(item.issue)}&body=${encodeURIComponent(item.process)}`;
+function filterCategory(c){
+  currentCategory = c;
+  applyFilters();
 }
 
-// Copy
-function copy(text) {
+function copy(text){
   navigator.clipboard.writeText(text);
   showToast("Copied!");
 }
 
-// Toast
-function showToast(msg) {
-  const t = document.getElementById("toast");
-  t.innerText = msg;
-  t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 2000);
+function email(issueEncoded){
+  const issue = decodeURIComponent(issueEncoded);
+  const item = data.find(d=>d.issue===issue);
+  window.location.href =
+    `mailto:?subject=${item.issue}&body=${item.process}`;
 }
 
-// Theme
-function toggleTheme() {
+function showToast(t){
+  const x = document.getElementById("toast");
+  x.innerText = t;
+  x.classList.add("show");
+  setTimeout(()=>x.classList.remove("show"),1500);
+}
+
+function toggleTheme(){
   document.body.classList.toggle("dark");
 }
 
-// Filter
-function filterCategory(cat) {
-  currentCategory = cat;
-  search();
+async function load(){
+  const res = await fetch("https://raw.githubusercontent.com/naderlabib-afk/support-processes/refs/heads/main/processes.json");
+  data = await res.json();
+  applyFilters();
 }
 
-// Init
-loadData();
+load();
+
+function downloadJSON(){
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "processes.json";
+  a.click();
+}
+
 </script>
 
 </body>
