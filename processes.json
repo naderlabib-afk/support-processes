@@ -33,7 +33,7 @@
     "category": "Location",
     "machine_type": "All",
     "issue": "DOM/TOM",
-    "process": "1. Ignore postal codes starting with 98xxx (except Monaco)\n2. Handle 97xxx with SSR only\n3. No CRU, ship to customer = No"
+    "process": "1. Ignore postal codes starting with 98xxx (except Monaco 98000)\n2. Handle 97xxx with SSR only\n3. No CRU, ship to customer = No"
   },
   {
     "category": "Location",
