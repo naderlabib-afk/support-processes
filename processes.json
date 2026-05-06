@@ -9,7 +9,7 @@
     "category": "Contract",
     "machine_type": "All",
     "issue": "IOL 9x5 NBD",
-    "process": "1. Create Work Order (WO) as NBD\n2. ship to customer (yes)\n3. No onsite service for T1 CRU parts"
+    "process": "1. Create Work Order CRU (WO) as NBD\n2. No onsite service for T1 CRU parts"
   },
   {
     "category": "Contract",
