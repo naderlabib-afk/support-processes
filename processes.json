@@ -38,6 +38,16 @@
   {
     "category": "Location",
     "machine_type": "All",
+    "issue": "Mayotte DOM/TOM special handling",
+    "process": ""1.WO should be ship to customer “YES” NBD\n2. In the WO change the address of original customer to be (IS2 MAYOTTE
+ZI de Kaweni Immeuble somibat
+97600 MAMOUDZOU
+MAYOTTE
+)\n3. Make sure in the WO instructions to clarify the original server location for the SSR to be aware, because in CSP WO address will be the one of IS2 where part will be delivered."
+  },
+  {
+    "category": "Location",
+    "machine_type": "All",
     "issue": "Andorra",
     "process": "1. Exclude Morabanc and Andbanc (handled by Spain)\n2. Use ship to customer = Yes\n3. Only NBD delivery (2-3 days expected)"
   },
