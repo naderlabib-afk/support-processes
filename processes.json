@@ -21,7 +21,7 @@
     "category": "Contract",
     "machine_type": "All",
     "issue": "24x7 Contract Handling",
-    "process": "1. Create WO based on customer request and part availability\n2. Select delivery option (2h/4h/NBD)\n3. If part unavailable locally, fallback to NBD\n4. Escalate OOH via L3 contact if needed"
+    "process": "1. Create WO based on customer request and part availability\n2. Select delivery option (2h/4h/NBD)\n3. If part unavailable locally, fallback to NBD\n4. Escalate OOH via L3 contact if needed\n5. If Severity 1, create PER after releasing the SBD WO"
   },
   {
     "category": "Location",
