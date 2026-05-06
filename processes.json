@@ -3,7 +3,7 @@
     "category": "Contract",
     "machine_type": "All",
     "issue": "Expired Contract (EEH)",
-    "process": "1. Verify contract status in system\n2. If no contract found, send email to customer requesting valid contract or offer quotation\n3. If contract provided, send to SDM for approval\n4. If quotation requested, send Order Confirmation template\n5. If signed, proceed with case handling (create WO, update entitlement)\n6. Share with IBM CSM the signed document and make sure SSR is aware that it's a billable case\7. If not signed or no response in 5 days, cancel case."
+    "process": "1. Verify contract status in system\n2. If no contract found, send email to customer requesting valid contract or offer quotation\n3. If contract provided, send to SDM for approval\n4. If quotation requested, send Order Confirmation template\n5. If signed, proceed with case handling (create WO, update entitlement)\n6. Share with IBM CSM the signed document and make sure SSR is aware that it's a billable case \7. If not signed or no response in 5 days, cancel case."
   },
   {
     "category": "Contract",
