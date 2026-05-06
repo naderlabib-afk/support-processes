@@ -192,7 +192,11 @@ function display(results) {
       <i>${item.category} | ${item.machine_type}</i>
       <pre>${highlight(item.process, keyword)}</pre>
     `;
-
+<div style="margin-top:5px;">
+    <button onclick="shareLink('${encodeURIComponent(item.issue)}')">🔗 Copy Link</button>
+    <button onclick="shareEmail('${encodeURIComponent(item.issue)}')">📧 Email</button>
+  </div>
+    
     container.appendChild(div);
   });
 }
@@ -383,7 +387,11 @@ function display(results) {
       <div class="meta">${item.category} | ${item.machine_type}</div>
       <pre>${item.process}</pre>
     `;
-
+<div style="margin-top:5px;">
+    <button onclick="shareLink('${encodeURIComponent(item.issue)}')">🔗 Copy Link</button>
+    <button onclick="shareEmail('${encodeURIComponent(item.issue)}')">📧 Email</button>
+  </div>
+    
     container.appendChild(div);
   });
 }
@@ -467,7 +475,10 @@ function display(results) {
       <i>Customer: ${item.customer}</i><br><br>
       <pre>${item.process}</pre>
     `;
-
+<div style="margin-top:5px;">
+    <button onclick="shareLink('${encodeURIComponent(item.issue)}')">🔗 Copy Link</button>
+    <button onclick="shareEmail('${encodeURIComponent(item.issue)}')">📧 Email</button>
+  </div>
     container.appendChild(div);
   });
 }
