@@ -1,5 +1,31 @@
 <!DOCTYPE html>
 <html>
+<button onclick="toggleAdmin()" style="margin:10px;">🔐 Admin</button>
+<div id="adminPanel" style="display:none; background:#fff; padding:15px; margin:20px; border-radius:10px;">
+  <h3>Admin Panel</h3>
+
+  <input id="adminPass" type="password" placeholder="Enter password">
+  <button onclick="unlockAdmin()">Unlock</button>
+
+  <div id="adminContent" style="display:none; margin-top:15px;">
+
+    <h4>Add / Edit Process</h4>
+
+    <input id="cat" placeholder="Category"><br><br>
+    <input id="machine" placeholder="Machine Type"><br><br>
+    <input id="issue" placeholder="Issue"><br><br>
+    <textarea id="process" placeholder="Process steps..." style="width:100%; height:100px;"></textarea><br><br>
+
+    <button onclick="saveProcess()">💾 Save</button>
+    <button onclick="clearForm()">Clear</button>
+
+    <h4>All Processes</h4>
+    <div id="adminList"></div>
+
+    <button onclick="downloadJSON()">⬇ Download JSON</button>
+
+  </div>
+</div>
 <head>
   <title>Process Finder</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -150,31 +176,7 @@
 
 <hr>
 
-<!-- ADMIN -->
-<button onclick="toggleAdmin()">🔐 Admin</button>
 
-<div id="adminPanel" style="display:none; background:#fff; padding:15px; margin-top:10px; border-radius:10px;">
-  <h3>Admin Panel</h3>
-
-  <input id="adminPass" type="password" placeholder="Enter password">
-  <button onclick="unlockAdmin()">Unlock</button>
-
-  <div id="adminContent" style="display:none; margin-top:10px;">
-
-    <input id="cat" placeholder="Category">
-    <input id="machine" placeholder="Machine Type">
-    <input id="issue" placeholder="Issue">
-    <textarea id="process" placeholder="Process"></textarea>
-
-    <button onclick="saveProcess()">💾 Save</button>
-    <button onclick="clearForm()">Clear</button>
-
-    <h4>All Processes</h4>
-    <div id="adminList"></div>
-
-    <button onclick="downloadJSON()">⬇ Download JSON</button>
-  </div>
-</div>
 
 </div>
 
