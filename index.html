@@ -341,17 +341,7 @@ function filterCategory(c){
   applyFilters();
 }
 
-// Hidden Admin Shortcut
-document.addEventListener("keydown", e => {
 
-  // CTRL + SHIFT + A
-  if (e.ctrlKey && e.shiftKey && e.key === "A") {
-
-    unlockAdmin();
-
-  }
-
-});
   
 function copy(text){
   navigator.clipboard.writeText(text);
@@ -382,6 +372,19 @@ async function load(){
   applyFilters();
 }
 
+
+// Hidden Admin Shortcut
+document.addEventListener("keydown", e => {
+
+  // CTRL + SHIFT + A
+  if (e.ctrlKey && e.shiftKey && e.key === "A") {
+
+    unlockAdmin();
+
+  }
+
+});
+  
 load();
 
 function downloadJSON(){
