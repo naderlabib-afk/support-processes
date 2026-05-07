@@ -367,14 +367,7 @@ function toggleTheme(){
   document.body.classList.toggle("dark");
 }
 
-async function load(){
-  const res = await fetch("https://raw.githubusercontent.com/naderlabib-afk/support-processes/refs/heads/main/processes.json");
-  data = await res.json();
-  applyFilters();
-}
-
-
-// Hidden Admin Shortcut
+  // Hidden Admin Shortcut
 document.addEventListener("keydown", e => {
 
   // CTRL + SHIFT + A
@@ -385,6 +378,15 @@ document.addEventListener("keydown", e => {
   }
 
 });
+  
+async function load(){
+  const res = await fetch("https://raw.githubusercontent.com/naderlabib-afk/support-processes/refs/heads/main/processes.json");
+  data = await res.json();
+  applyFilters();
+}
+
+
+
   
 load();
 
