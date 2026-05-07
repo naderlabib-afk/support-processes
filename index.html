@@ -1,31 +1,5 @@
 <!DOCTYPE html>
 <html>
-  <!-- ADMIN -->
-
-
-<div id="adminPanel" style="display:none; background:#fff; padding:15px; margin-top:10px; border-radius:10px;">
-  <h3>Admin Panel</h3>
-
-  <input id="adminPass" type="password" placeholder="Enter password">
-  <button onclick="unlockAdmin()">Unlock</button>
-
-  <div id="adminContent" style="display:none; margin-top:10px;">
-
-    <input id="cat" placeholder="Category">
-    <input id="machine" placeholder="Machine Type">
-    <input id="issue" placeholder="Issue">
-    <textarea id="process" placeholder="Process"></textarea>
-
-    <button onclick="saveProcess()">💾 Save</button>
-    <button onclick="clearForm()">Clear</button>
-
-    <h4>All Processes</h4>
-    <div id="adminList"></div>
-
-    <button onclick="downloadJSON()">⬇ Download JSON</button>
-  </div>
-</div>
-
 <head>
   <title>Process Finder</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -176,6 +150,31 @@
 
 <hr>
 
+<!-- ADMIN -->
+<button onclick="toggleAdmin()">🔐 Admin</button>
+
+<div id="adminPanel" style="display:none; background:#fff; padding:15px; margin-top:10px; border-radius:10px;">
+  <h3>Admin Panel</h3>
+
+  <input id="adminPass" type="password" placeholder="Enter password">
+  <button onclick="unlockAdmin()">Unlock</button>
+
+  <div id="adminContent" style="display:none; margin-top:10px;">
+
+    <input id="cat" placeholder="Category">
+    <input id="machine" placeholder="Machine Type">
+    <input id="issue" placeholder="Issue">
+    <textarea id="process" placeholder="Process"></textarea>
+
+    <button onclick="saveProcess()">💾 Save</button>
+    <button onclick="clearForm()">Clear</button>
+
+    <h4>All Processes</h4>
+    <div id="adminList"></div>
+
+    <button onclick="downloadJSON()">⬇ Download JSON</button>
+  </div>
+</div>
 
 </div>
 
@@ -342,8 +341,6 @@ function filterCategory(c){
   applyFilters();
 }
 
-
-  
 function copy(text){
   navigator.clipboard.writeText(text);
   showToast("Copied!");
@@ -364,34 +361,15 @@ function showToast(t){
 }
 
 function toggleTheme(){
-  document.addEventListener("keydown", e => {
+  document.body.classList.toggle("dark");
+}
 
-  // CTRL + SHIFT + A
-  if (e.ctrlKey && e.shiftKey && e.key === "A") {
-
-    const panel = document.getElementById("adminPanel");
-
-    // Show hidden admin panel
-    panel.style.display = "block";
-
-    // Focus password field automatically
-    document.getElementById("adminPass").focus();
-
-    showToast("Admin panel opened");
-
-  }
-
-});
-  
 async function load(){
   const res = await fetch("https://raw.githubusercontent.com/naderlabib-afk/support-processes/refs/heads/main/processes.json");
   data = await res.json();
   applyFilters();
 }
 
-
-
-  
 load();
 
 function downloadJSON(){
