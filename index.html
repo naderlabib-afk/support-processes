@@ -1,31 +1,6 @@
 <!DOCTYPE html>
 <html>
-<button onclick="toggleAdmin()" style="margin:10px;">🔐 Admin</button>
-<div id="adminPanel" style="display:none; background:#fff; padding:15px; margin:20px; border-radius:10px;">
-  <h3>Admin Panel</h3>
 
-  <input id="adminPass" type="password" placeholder="Enter password">
-  <button onclick="unlockAdmin()">Unlock</button>
-
-  <div id="adminContent" style="display:none; margin-top:15px;">
-
-    <h4>Add / Edit Process</h4>
-
-    <input id="cat" placeholder="Category"><br><br>
-    <input id="machine" placeholder="Machine Type"><br><br>
-    <input id="issue" placeholder="Issue"><br><br>
-    <textarea id="process" placeholder="Process steps..." style="width:100%; height:100px;"></textarea><br><br>
-
-    <button onclick="saveProcess()">💾 Save</button>
-    <button onclick="clearForm()">Clear</button>
-
-    <h4>All Processes</h4>
-    <div id="adminList"></div>
-
-    <button onclick="downloadJSON()">⬇ Download JSON</button>
-
-  </div>
-</div>
 <head>
   <title>Process Finder</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -61,6 +36,7 @@
       justify-content: space-between;
       position: sticky;
       top: 0;
+      z-index: 100;
     }
 
     .container {
@@ -69,12 +45,38 @@
       padding: 20px;
     }
 
-    input, textarea {
+    input, textarea, select {
       width: 100%;
       padding: 10px;
       border-radius: 8px;
       border: none;
       margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+
+    .search-wrapper {
+      position: relative;
+    }
+
+    .suggestions {
+      position: absolute;
+      width: 100%;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 999;
+    }
+
+    .suggestion {
+      padding: 10px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+      color: black;
+    }
+
+    .suggestion:hover {
+      background: #f1f2f6;
     }
 
     .buttons button {
@@ -111,7 +113,6 @@
     .copy { background: #9c88ff; color: white; }
     .fav { background: #fbc531; }
 
-    /* TOOLTIP */
     .actions button:hover::after {
       content: attr(data-tooltip);
       position: absolute;
@@ -147,6 +148,14 @@
     }
 
     .toast.show { opacity: 1; }
+
+    #adminPanel {
+      display:none;
+      background:#fff;
+      padding:15px;
+      margin:20px;
+      border-radius:10px;
+    }
   </style>
 </head>
 
@@ -159,25 +168,59 @@
 
 <div class="container">
 
-<input type="text" id="search" placeholder="Search...">
+  <div class="search-wrapper">
+    <input type="text" id="search" placeholder="Search...">
+    <div id="suggestions" class="suggestions"></div>
+  </div>
 
-<div class="buttons">
-  <button onclick="filterCategory('')">All</button>
-  <button onclick="filterCategory('Contract')">Contract</button>
-  <button onclick="filterCategory('Location')">Location</button>
-  <button onclick="filterCategory('Customer')">Customer</button>
-  <button onclick="filterCategory('Machine Type')">Machine</button>
+  <div class="buttons">
+    <button onclick="filterCategory('')">All</button>
+    <button onclick="filterCategory('Contract')">Contract</button>
+    <button onclick="filterCategory('Location')">Location</button>
+    <button onclick="filterCategory('Customer')">Customer</button>
+    <button onclick="filterCategory('Machine Type')">Machine</button>
+    <button onclick="filterCategory('Part')">Part</button>
+  </div>
+
+  <h3>⭐ Favorites</h3>
+  <div id="favorites"></div>
+
+  <div id="results"></div>
+
 </div>
 
-<h3>⭐ Favorites</h3>
-<div id="favorites"></div>
+<!-- ADMIN -->
+<div id="adminPanel">
 
-<div id="results"></div>
+  <h3>Admin Panel</h3>
 
-<hr>
+  <input id="adminPass" type="password" placeholder="Enter password">
+  <button onclick="unlockAdmin()">Unlock</button>
 
+  <div id="adminContent" style="display:none; margin-top:10px;">
 
+    <!-- CATEGORY DROPDOWN -->
+    <select id="cat">
+      <option value="Contract">Contract</option>
+      <option value="Location">Location</option>
+      <option value="Customer">Customer</option>
+      <option value="Machine Type">Machine Type</option>
+      <option value="Part">Part</option>
+    </select>
 
+    <input id="machine" placeholder="Machine Type">
+    <input id="issue" placeholder="Issue">
+    <textarea id="process" placeholder="Process"></textarea>
+
+    <button onclick="saveProcess()">💾 Save</button>
+    <button onclick="clearForm()">Clear</button>
+
+    <h4>All Processes</h4>
+    <div id="adminList"></div>
+
+    <button onclick="downloadJSON()">⬇ Download JSON</button>
+
+  </div>
 </div>
 
 <div id="toast" class="toast"></div>
@@ -191,21 +234,19 @@ let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
 let currentCategory = "";
 let editIndex = null;
 
-/* ================= ADMIN ================= */
-
-function toggleAdmin() {
-  const p = document.getElementById("adminPanel");
-  p.style.display = p.style.display === "none" ? "block" : "none";
-}
+/* ADMIN */
 
 function unlockAdmin() {
   if (document.getElementById("adminPass").value === ADMIN_PASSWORD) {
     document.getElementById("adminContent").style.display = "block";
     renderAdminList();
-  } else alert("Wrong password");
+  } else {
+    showToast("Wrong password");
+  }
 }
 
 function saveProcess() {
+
   const item = {
     category: cat.value,
     machine_type: machine.value,
@@ -213,7 +254,7 @@ function saveProcess() {
     process: process.value
   };
 
-  if (!item.issue) return alert("Issue required");
+  if (!item.issue) return;
 
   if (editIndex !== null) {
     data[editIndex] = item;
@@ -229,10 +270,12 @@ function saveProcess() {
 
 function editProcess(i) {
   const d = data[i];
+
   cat.value = d.category;
   machine.value = d.machine_type;
   issue.value = d.issue;
   process.value = d.process;
+
   editIndex = i;
 }
 
@@ -243,30 +286,41 @@ function deleteProcess(i) {
 }
 
 function renderAdminList() {
+
   const c = document.getElementById("adminList");
   c.innerHTML = "";
+
   data.forEach((d,i)=>{
+
     c.innerHTML += `
-      <div>
+      <div style="margin-bottom:5px;">
         <b>${d.issue}</b>
         <button onclick="editProcess(${i})">✏️</button>
         <button onclick="deleteProcess(${i})">❌</button>
-      </div>`;
+      </div>
+    `;
   });
 }
 
-function clearForm(){
-  cat.value = machine.value = issue.value = process.value = "";
+function clearForm() {
+  machine.value = "";
+  issue.value = "";
+  process.value = "";
 }
 
-/* ================= SEARCH CORE FIX ================= */
+/* SEARCH */
 
-document.getElementById("search").addEventListener("input", applyFilters);
+document.getElementById("search").addEventListener("input", () => {
+  applyFilters();
+  showSuggestions();
+});
 
 function applyFilters() {
+
   const k = document.getElementById("search").value.toLowerCase();
 
   const filtered = data.filter(i => {
+
     const matchSearch =
       !k ||
       i.issue.toLowerCase().includes(k) ||
@@ -284,7 +338,46 @@ function applyFilters() {
   renderFavorites();
 }
 
+/* SMART SUGGESTIONS */
+
+function showSuggestions() {
+
+  const k = search.value.toLowerCase();
+  const s = document.getElementById("suggestions");
+
+  s.innerHTML = "";
+
+  if (!k) return;
+
+  const suggestions = [];
+
+  data.forEach(i => {
+
+    if (i.issue.toLowerCase().includes(k))
+      suggestions.push(i.issue);
+
+  });
+
+  [...new Set(suggestions)].slice(0,5).forEach(text => {
+
+    s.innerHTML += `
+      <div class="suggestion" onclick="selectSuggestion('${text.replace(/'/g,"")}')">
+        ${text}
+      </div>
+    `;
+  });
+}
+
+function selectSuggestion(text) {
+  search.value = text;
+  suggestions.innerHTML = "";
+  applyFilters();
+}
+
+/* RENDER */
+
 function renderList(list) {
+
   const r = document.getElementById("results");
   r.innerHTML = "";
 
@@ -294,49 +387,74 @@ function renderList(list) {
   }
 
   list.slice(0,15).forEach(i=>{
+
     r.innerHTML += `
       <div class="card">
+
         <div class="title">${i.issue}</div>
-        <div class="meta">${i.category} | ${i.machine_type}</div>
+
+        <div class="meta">
+          ${i.category} | ${i.machine_type}
+        </div>
 
         <div class="actions">
-          <button class="email" data-tooltip="Share by email"
-            onclick="email('${encodeURIComponent(i.issue)}')">📤</button>
 
-          <button class="copy" data-tooltip="Copy process"
-            onclick="copy(\`${i.process}\`)">📋</button>
+          <button class="email"
+            data-tooltip="Share by email"
+            onclick="email('${encodeURIComponent(i.issue)}')">
+            📤
+          </button>
 
-          <button class="fav" data-tooltip="Favorite"
-            onclick="toggleFav('${i.issue}')">⭐</button>
+          <button class="copy"
+            data-tooltip="Copy process"
+            onclick="copy(\`${i.process}\`)">
+            📋
+          </button>
+
+          <button class="fav"
+            data-tooltip="Favorite"
+            onclick="toggleFav('${i.issue}')">
+            ⭐
+          </button>
+
         </div>
 
         <pre>${i.process}</pre>
-      </div>`;
+
+      </div>
+    `;
   });
 }
 
-/* ================= FAVORITES ================= */
+/* FAVORITES */
 
 function toggleFav(issue){
+
   if(favorites.includes(issue))
     favorites = favorites.filter(f=>f!==issue);
-  else favorites.push(issue);
+  else
+    favorites.push(issue);
 
   localStorage.setItem("favorites", JSON.stringify(favorites));
+
   applyFilters();
 }
 
 function renderFavorites(){
+
   const c = document.getElementById("favorites");
   c.innerHTML = "";
 
   favorites.forEach(f=>{
+
     const i = data.find(d=>d.issue===f);
-    if(i) c.innerHTML += `<div class="card">${i.issue}</div>`;
+
+    if(i)
+      c.innerHTML += `<div class="card">${i.issue}</div>`;
   });
 }
 
-/* ================= OTHER ================= */
+/* OTHER */
 
 function filterCategory(c){
   currentCategory = c;
@@ -349,16 +467,22 @@ function copy(text){
 }
 
 function email(issueEncoded){
+
   const issue = decodeURIComponent(issueEncoded);
   const item = data.find(d=>d.issue===issue);
+
   window.location.href =
     `mailto:?subject=${item.issue}&body=${item.process}`;
 }
 
 function showToast(t){
+
   const x = document.getElementById("toast");
+
   x.innerText = t;
+
   x.classList.add("show");
+
   setTimeout(()=>x.classList.remove("show"),1500);
 }
 
@@ -366,20 +490,51 @@ function toggleTheme(){
   document.body.classList.toggle("dark");
 }
 
+/* HIDDEN ADMIN SHORTCUT */
+
+document.addEventListener("keydown", e => {
+
+  if (e.ctrlKey && e.shiftKey && e.key === "U") {
+
+    document.getElementById("adminPanel").style.display = "block";
+
+    document.getElementById("adminPass").focus();
+
+    showToast("Admin panel opened");
+  }
+});
+
+/* LOAD */
+
 async function load(){
-  const res = await fetch("https://raw.githubusercontent.com/naderlabib-afk/support-processes/refs/heads/main/processes.json");
+
+  const res = await fetch(
+    "https://raw.githubusercontent.com/naderlabib-afk/support-processes/refs/heads/main/processes.json?t=" + Date.now()
+  );
+
   data = await res.json();
+
   applyFilters();
 }
 
 load();
 
+/* DOWNLOAD JSON */
+
 function downloadJSON(){
-  const blob = new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+
+  const blob = new Blob(
+    [JSON.stringify(data,null,2)],
+    {type:"application/json"}
+  );
+
   const url = URL.createObjectURL(blob);
+
   const a = document.createElement("a");
+
   a.href = url;
   a.download = "processes.json";
+
   a.click();
 }
 
