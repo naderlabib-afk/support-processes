@@ -51,7 +51,7 @@
     "category": "Customer",
     "machine_type": "All",
     "issue": "Dassault & MBDA",
-    "process": "1. Suppose they have active Growth contract seen in warranty look-up\n2. If yes, proceed to handle on CSP, use Ecurep for communication, cst may send logs to LSC or attached to mail.\n3. If escalation to L3 (ATS) is required, create MSD case.\n4. If part replacement is required, create MSD if there wasn't any, order part ONS (ship to customer - NO).\n5. After releasing the MSD WO, cancel the labor onsite service, and make sure the newly generated TS is cancelled.\n6. On the original TS (for Growth contract) make sure to share with CC/SSR the ETA of part delivery and all necessary information.\n7. Make sure not to request FW update unless L3 insist on it , customer should have best recipe.\n8. Customer must confirm closure\n"
+    "process": "1. Basically they have active Growth contract seen in warranty look-up\n2. If yes, proceed to handle on CSP, use Ecurep for communication, cst may send logs to LSC or attached to mail.\n3. If escalation to L3 (ATS) is required, create MSD case.\n4. If part replacement is required, create MSD if there wasn't any, order part ONS (ship to customer - NO).\n5. After releasing the MSD WO, cancel the labor onsite service, and make sure the newly generated TS is cancelled.\n6. On the original TS (for Growth contract) make sure to share with CC/SSR the ETA of part delivery and all necessary information.\n7. Make sure not to request FW update unless L3 insist on it , customer should have best recipe.\n8. Customer must confirm closure\n"
   },
   {
     "category": "Contract",
