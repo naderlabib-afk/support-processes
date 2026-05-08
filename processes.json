@@ -130,5 +130,11 @@
     "machine_type": "All",
     "issue": "IBM RTS Golden Rules for Lenovo ISG",
     "process": "IBM RTS Golden Rules for Lenovo ISG and process specifics - This is IBM RTS golden rules for RTS agents, case ownership, documentation, communication, escalation, reporting, Cancellation guideline,  Guidance on the \"send/don´t send survey\" feature, when closing a case, Can I send a part for 1st action plan for which no part is needed, respectively can I send two parts for the 1st onsite visit etc\n\nhttps://ibm.box.com/s/216qi5kkzh0dhahpc1xasbd7eh2f69b0"
+  },
+  {
+    "category": "Customer",
+    "machine_type": "All",
+    "issue": "ISDM special handling",
+    "process": "1.\tAlways communicate by email (unless customer requests phone communication)\n2.\tAlways keep email history in communication\n3.\tIf power / temperature issue, always check with customer if they encountered any issue with CDU (if case needs L3 assistance, always inform L3 of CDU installation)\n4.\tNever request customer to confirm asset location. All machines are hosted in CINES datacenter (CINES - 950 rue St Priest - 34090 Montpellier – France) Local contact : Jean-Luc OMS - 06 32 01 04 17\n5.\tSSR needs to have ZRR accreditation (RMC has approved list)"
   }
 ]
