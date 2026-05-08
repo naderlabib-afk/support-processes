@@ -1,541 +1,454 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-  <title>Process Finder</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Process Finder</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <style>
-    :root {
-      --bg: #eef2f7;
-      --card: white;
-      --text: #2f3640;
-      --accent: #40739e;
-    }
+<style>
+:root {
+ --bg:#eef2f7;
+ --card:white;
+ --text:#2f3640;
+ --accent:#40739e;
+}
+body.dark {
+ --bg:#1e272e;
+ --card:#2f3640;
+ --text:#f5f6fa;
+ --accent:#00a8ff;
+}
+body {
+ margin:0;
+ font-family:'Segoe UI',sans-serif;
+ background:var(--bg);
+ color:var(--text);
+}
 
-    body.dark {
-      --bg: #1e272e;
-      --card: #2f3640;
-      --text: #f5f6fa;
-      --accent: #00a8ff;
-    }
+header{
+ background:rgba(39,60,117,0.9);
+ color:white;
+ padding:15px;
+ display:flex;
+ justify-content:space-between;
+ position:sticky;
+ top:0;
+ z-index:100;
+}
 
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      transition: 0.3s;
-    }
+.container{
+ max-width:900px;
+ margin:auto;
+ padding:20px;
+}
 
-    header {
-      background: rgba(39,60,117,0.9);
-      color: white;
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
+input,textarea,select{
+ width:100%;
+ padding:10px;
+ border-radius:8px;
+ border:none;
+ margin-bottom:10px;
+}
 
-    .container {
-      max-width: 900px;
-      margin: auto;
-      padding: 20px;
-    }
+.buttons button{
+ margin:4px;
+ padding:8px 12px;
+ border:none;
+ border-radius:20px;
+ background:var(--accent);
+ color:white;
+ cursor:pointer;
+}
 
-    input, textarea, select {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      margin-bottom: 10px;
-      box-sizing: border-box;
-    }
+.buttons button.active {
+ background:#273c75;
+ transform:scale(1.05);
+}
 
-    .search-wrapper {
-      position: relative;
-    }
 
-    .suggestions {
-      position: absolute;
-      width: 100%;
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      z-index: 999;
-    }
 
-    .suggestion {
-      padding: 10px;
-      cursor: pointer;
-      border-bottom: 1px solid #eee;
-      color: black;
-    }
+.card{
+ background:var(--card);
+ padding:15px;
+ border-radius:10px;
+ margin-bottom:12px;
+ box-shadow:0 6px 15px rgba(0,0,0,0.1);
+}
 
-    .suggestion:hover {
-      background: #f1f2f6;
-    }
+.actions button{
+ margin-right:5px;
+ padding:6px 10px;
+ border-radius:6px;
+ border:none;
+ cursor:pointer;
+}
 
-    .buttons button {
-      margin: 4px;
-      padding: 8px 14px;
-      border-radius: 20px;
-      border: none;
-      background: var(--accent);
-      color: white;
-      cursor: pointer;
-    }
+.email{background:#00a8ff;color:white;}
+.copy{background:#9c88ff;color:white;}
+.fav{background:#fbc531;}
+.fav.active{
+ background:#e1b12c;
+ box-shadow:0 0 5px #fbc531;
+}
 
-    .card {
-      background: var(--card);
-      padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 12px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-    }
+mark{
+ background:yellow;
+ color:black;
+}
 
-    .title { font-weight: bold; }
-    .meta { font-size: 12px; opacity: 0.7; margin-bottom: 8px; }
+#backToTop{
+ position:fixed;
+ bottom:20px;
+ left:20px;
+ padding:12px;
+ border-radius:50%;
+ background:#40739e;
+ color:white;
+ border:none;
+ cursor:pointer;
+ display:none;
+}
 
-    .actions button {
-      margin-right: 5px;
-      padding: 6px 10px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      position: relative;
-    }
+#adminPanel{
+ display:none;
+ background:#fff;
+ padding:15px;
+ margin:20px;
+ border-radius:10px;
+}
 
-    .email { background: #00a8ff; color: white; }
-    .copy { background: #9c88ff; color: white; }
-    .fav { background: #fbc531; }
-
-    .actions button:hover::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      bottom: 125%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.85);
-      color: white;
-      padding: 5px 8px;
-      border-radius: 6px;
-      font-size: 11px;
-      white-space: nowrap;
-      z-index: 10;
-    }
-
-    pre {
-      background: rgba(0,0,0,0.05);
-      padding: 10px;
-      border-radius: 8px;
-      white-space: pre-wrap;
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: black;
-      color: white;
-      padding: 10px;
-      border-radius: 8px;
-      opacity: 0;
-      transition: 0.3s;
-    }
-
-    .toast.show { opacity: 1; }
-
-    #adminPanel {
-      display:none;
-      background:#fff;
-      padding:15px;
-      margin:20px;
-      border-radius:10px;
-    }
-  </style>
+pre{
+ background:rgba(0,0,0,0.05);
+ padding:10px;
+ border-radius:8px;
+ white-space:pre-wrap;
+}
+</style>
 </head>
 
 <body>
 
 <header>
-  🔧 Process Finder
-  <button onclick="toggleTheme()">🌙</button>
+ 🔧 Process Finder
+ <button onclick="toggleTheme()">🌙</button>
 </header>
 
 <div class="container">
 
-  <div class="search-wrapper">
-    <input type="text" id="search" placeholder="Search...">
-    <div id="suggestions" class="suggestions"></div>
-  </div>
+<input id="search" placeholder="Search...">
 
-  <div class="buttons">
-    <button onclick="filterCategory('')">All</button>
-    <button onclick="filterCategory('Contract')">Contract</button>
-    <button onclick="filterCategory('Location')">Location</button>
-    <button onclick="filterCategory('Customer')">Customer</button>
-    <button onclick="filterCategory('Machine Type')">Machine</button>
-    <button onclick="filterCategory('Part')">Part</button>
-  </div>
+<div class="buttons" id="filterButtons">
+ <button onclick="setFilter(this,'')">All</button>
+ <button onclick="setFilter(this,'FAVORITES')">⭐ Favorites</button>
+ <button onclick="setFilter(this,'Contract')">Contract</button>
+ <button onclick="setFilter(this,'Location')">Location</button>
+ <button onclick="setFilter(this,'Customer')">Customer</button>
+ <button onclick="setFilter(this,'Machine Type')">Machine</button>
+ <button onclick="setFilter(this,'Part')">Part</button>
+</div>
 
-  <h3>⭐ Favorites</h3>
-  <div id="favorites"></div>
+<h3>⭐ Favorites</h3>
+<div id="favorites"></div>
 
-  <div id="results"></div>
+<div id="results"></div>
 
 </div>
+
+<button id="backToTop" onclick="scrollToTop()">⬆</button>
 
 <!-- ADMIN -->
 <div id="adminPanel">
+<h3>Admin Panel</h3>
 
-  <h3>Admin Panel</h3>
+<input id="adminPass" type="password" placeholder="Enter password">
+<button onclick="unlockAdmin()">Unlock</button>
 
-  <input id="adminPass" type="password" placeholder="Enter password">
-  <button onclick="unlockAdmin()">Unlock</button>
+<div id="adminContent" style="display:none; margin-top:10px;">
 
-  <div id="adminContent" style="display:none; margin-top:10px;">
+<select id="cat">
+<option value="Contract">Contract</option>
+<option value="Location">Location</option>
+<option value="Customer">Customer</option>
+<option value="Machine Type">Machine Type</option>
+<option value="Part">Part</option>
+</select>
 
-    <!-- CATEGORY DROPDOWN -->
-    <select id="cat">
-      <option value="Contract">Contract</option>
-      <option value="Location">Location</option>
-      <option value="Customer">Customer</option>
-      <option value="Machine Type">Machine Type</option>
-      <option value="Part">Part</option>
-    </select>
+<input id="machine" placeholder="Machine Type">
+<input id="issue" placeholder="Issue">
+<textarea id="process" placeholder="Process"></textarea>
 
-    <input id="machine" placeholder="Machine Type">
-    <input id="issue" placeholder="Issue">
-    <textarea id="process" placeholder="Process"></textarea>
+<button onclick="saveProcess()">💾 Save</button>
+<button onclick="clearForm()">Clear</button>
 
-    <button onclick="saveProcess()">💾 Save</button>
-    <button onclick="clearForm()">Clear</button>
+<h4>All Processes</h4>
+<div id="adminList"></div>
 
-    <h4>All Processes</h4>
-    <div id="adminList"></div>
+<button onclick="downloadJSON()">⬇ Download JSON</button>
 
-    <button onclick="downloadJSON()">⬇ Download JSON</button>
-
-  </div>
 </div>
-
-<div id="toast" class="toast"></div>
+</div>
 
 <script>
 
-const ADMIN_PASSWORD = "1234";
+function updateCategoryCounts(){
+ const counts = {
+  FAVORITES: favoritesArr.length
+ };
 
-let data = [];
-let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
-let currentCategory = "";
-let editIndex = null;
+ data.forEach(i=>{
+  counts[i.category] = (counts[i.category] || 0) + 1;
+ });
+
+ const buttons = document.querySelectorAll('#filterButtons button');
+
+ buttons.forEach(btn=>{
+  const text = btn.innerText.replace(/\(.*\)/,'').trim();
+
+  if(text === "All"){
+   btn.innerText = `All (${data.length})`;
+  }
+  else if(text.includes("Favorites")){
+   btn.innerText = `⭐ Favorites (${counts.FAVORITES || 0})`;
+  }
+  else{
+   btn.innerText = `${text} (${counts[text] || 0})`;
+  }
+ });
+}
+
+const ADMIN_PASSWORD="1234";
+let data=[];
+let favoritesArr=JSON.parse(localStorage.getItem("favorites")||"[]");
+let currentCategory="";
+let editIndex=null;
+
+/* SAFE HTML */
+function escapeHTML(str){
+ return str.replace(/[&<>"']/g,(m)=>(
+ {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]
+ ));
+}
+
+/* HIGHLIGHT */
+function highlight(text,k){
+ if(!k) return text;
+ const r=new RegExp(`(${k})`,'gi');
+ return text.replace(r,'<mark>$1</mark>');
+}
 
 /* ADMIN */
-
-function unlockAdmin() {
-  if (document.getElementById("adminPass").value === ADMIN_PASSWORD) {
-    document.getElementById("adminContent").style.display = "block";
-    renderAdminList();
-  } else {
-    showToast("Wrong password");
-  }
-}
-
-function saveProcess() {
-
-  const item = {
-    category: cat.value,
-    machine_type: machine.value,
-    issue: issue.value,
-    process: process.value
-  };
-
-  if (!item.issue) return;
-
-  if (editIndex !== null) {
-    data[editIndex] = item;
-    editIndex = null;
-  } else {
-    data.push(item);
-  }
-
-  applyFilters();
+function unlockAdmin(){
+ if(adminPass.value===ADMIN_PASSWORD){
+  adminContent.style.display="block";
   renderAdminList();
-  clearForm();
+ }
 }
 
-function editProcess(i) {
-  const d = data[i];
+function saveProcess(){
+ const item={
+  category:cat.value,
+  machine_type:machine.value,
+  issue:issue.value,
+  process:process.value
+ };
 
-  cat.value = d.category;
-  machine.value = d.machine_type;
-  issue.value = d.issue;
-  process.value = d.process;
+ if(editIndex!==null){
+  data[editIndex]=item;
+  editIndex=null;
+ } else{
+  data.push(item);
+ }
 
-  editIndex = i;
+ applyFilters();
+ renderAdminList();
+ clearForm();
+updateCategoryCounts();
 }
 
-function deleteProcess(i) {
+function clearForm(){
+ machine.value="";
+ issue.value="";
+ process.value="";
+}
+
+function renderAdminList(){
+ adminList.innerHTML="";
+ data.forEach((d,i)=>{
+  adminList.innerHTML+=`
+  <div style="margin-bottom:6px;">
+   <b>${escapeHTML(d.issue)}</b>
+   <button onclick="editProcess(${i})">✏️</button>
+   <button onclick="deleteProcess(${i})">❌</button>
+  </div>`;
+ });
+}
+
+function deleteProcess(i){
+ if(confirm("Delete this process?")){
   data.splice(i,1);
   applyFilters();
   renderAdminList();
+ }
 }
 
-function renderAdminList() {
-
-  const c = document.getElementById("adminList");
-  c.innerHTML = "";
-
-  data.forEach((d,i)=>{
-
-    c.innerHTML += `
-      <div style="margin-bottom:5px;">
-        <b>${d.issue}</b>
-        <button onclick="editProcess(${i})">✏️</button>
-        <button onclick="deleteProcess(${i})">❌</button>
-      </div>
-    `;
-  });
+function editProcess(i){
+ const d=data[i];
+ cat.value=d.category;
+ machine.value=d.machine_type;
+ issue.value=d.issue;
+ process.value=d.process;
+ editIndex=i;
 }
 
-function clearForm() {
-  machine.value = "";
-  issue.value = "";
-  process.value = "";
+/* FILTER + SORT */
+
+function applyFilters(){
+ const k=search.value.toLowerCase();
+
+ let filtered=data.filter(i=>{
+  const matchSearch=
+   !k ||
+   i.issue.toLowerCase().includes(k) ||
+   i.process.toLowerCase().includes(k) ||
+   i.category.toLowerCase().includes(k) ||
+   i.machine_type.toLowerCase().includes(k);
+
+let matchCat = !currentCategory || i.category === currentCategory;
+
+/* ✅ ADD THIS BLOCK */
+if(currentCategory === "FAVORITES"){
+ matchCat = favoritesArr.includes(i.issue);
 }
+  return matchSearch && matchCat;
+ });
 
-/* SEARCH */
+/* ✅ Favorites first */
+ filtered.sort((a,b)=>{
+  return favoritesArr.includes(b.issue) - favoritesArr.includes(a.issue);
+ });
 
-document.getElementById("search").addEventListener("input", () => {
-  applyFilters();
-  showSuggestions();
-});
-
-function applyFilters() {
-
-  const k = document.getElementById("search").value.toLowerCase();
-
-  const filtered = data.filter(i => {
-
-    const matchSearch =
-      !k ||
-      i.issue.toLowerCase().includes(k) ||
-      i.process.toLowerCase().includes(k) ||
-      i.category.toLowerCase().includes(k) ||
-      i.machine_type.toLowerCase().includes(k);
-
-    const matchCat =
-      !currentCategory || i.category === currentCategory;
-
-    return matchSearch && matchCat;
-  });
-
-  renderList(filtered);
-  renderFavorites();
-}
-
-/* SMART SUGGESTIONS */
-
-function showSuggestions() {
-
-  const k = search.value.toLowerCase();
-  const s = document.getElementById("suggestions");
-
-  s.innerHTML = "";
-
-  if (!k) return;
-
-  const suggestions = [];
-
-  data.forEach(i => {
-
-    if (i.issue.toLowerCase().includes(k))
-      suggestions.push(i.issue);
-
-  });
-
-  [...new Set(suggestions)].slice(0,5).forEach(text => {
-
-    s.innerHTML += `
-      <div class="suggestion" onclick="selectSuggestion('${text.replace(/'/g,"")}')">
-        ${text}
-      </div>
-    `;
-  });
-}
-
-function selectSuggestion(text) {
-  search.value = text;
-  suggestions.innerHTML = "";
-  applyFilters();
+ renderList(filtered,k);
+ renderFavorites();
 }
 
 /* RENDER */
+function renderList(list,k){
+ results.innerHTML=`<h3>Results (${list.length})</h3>`;
 
-function renderList(list) {
+ list.forEach(i=>{
+  const active=favoritesArr.includes(i.issue)?"active":"";
 
-  const r = document.getElementById("results");
-  r.innerHTML = "";
+  const div=document.createElement("div");
+  div.className="card";
 
-  if (!list.length) {
-    r.innerHTML = "<p>No results found</p>";
-    return;
-  }
+  div.innerHTML=`
+  <b>${highlight(escapeHTML(i.issue),k)}</b>
+  <div>${escapeHTML(i.category)} | ${escapeHTML(i.machine_type)}</div>
 
-  list.slice(0,15).forEach(i=>{
+  <div class="actions">
+   <button class="email" onclick="email('${encodeURIComponent(i.issue)}')">📤</button>
+   <button class="copy" onclick="copy(\`${escapeHTML(i.process)}\`)">📋</button>
+   <button class="fav ${active}" onclick="toggleFav('${i.issue}')">⭐</button>
+  </div>
 
-    r.innerHTML += `
-      <div class="card">
-
-        <div class="title">${i.issue}</div>
-
-        <div class="meta">
-          ${i.category} | ${i.machine_type}
-        </div>
-
-        <div class="actions">
-
-          <button class="email"
-            data-tooltip="Share by email"
-            onclick="email('${encodeURIComponent(i.issue)}')">
-            📤
-          </button>
-
-          <button class="copy"
-            data-tooltip="Copy process"
-            onclick="copy(\`${i.process}\`)">
-            📋
-          </button>
-
-          <button class="fav"
-            data-tooltip="Favorite"
-            onclick="toggleFav('${i.issue}')">
-            ⭐
-          </button>
-
-        </div>
-
-        <pre>${i.process}</pre>
-
-      </div>
-    `;
-  });
+  <pre>${highlight(escapeHTML(i.process),k)}</pre>
+  `;
+  results.appendChild(div);
+ });
 }
 
 /* FAVORITES */
-
 function toggleFav(issue){
+ if(favoritesArr.includes(issue))
+  favoritesArr=favoritesArr.filter(f=>f!==issue);
+ else
+  favoritesArr.push(issue);
 
-  if(favorites.includes(issue))
-    favorites = favorites.filter(f=>f!==issue);
-  else
-    favorites.push(issue);
-
-  localStorage.setItem("favorites", JSON.stringify(favorites));
-
-  applyFilters();
+ localStorage.setItem("favorites",JSON.stringify(favoritesArr));
+ applyFilters();
 }
 
 function renderFavorites(){
+ const c=document.getElementById("favorites");
+ c.innerHTML="";
 
-  const c = document.getElementById("favorites");
-  c.innerHTML = "";
+ const favItems=data.filter(d=>favoritesArr.includes(d.issue));
 
-  favorites.forEach(f=>{
-
-    const i = data.find(d=>d.issue===f);
-
-    if(i)
-      c.innerHTML += `<div class="card">${i.issue}</div>`;
-  });
+ favItems.forEach(i=>{
+  c.innerHTML+=`
+  <div class="card">
+   <b>${escapeHTML(i.issue)}</b>
+   <div>${escapeHTML(i.category)} | ${escapeHTML(i.machine_type)}</div>
+   <pre>${escapeHTML(i.process)}</pre>
+  </div>`;
+ });
 }
 
-/* OTHER */
+/* FILTER BUTTONS */
 
-function filterCategory(c){
-  currentCategory = c;
-  applyFilters();
+function setFilter(btn, category){
+ currentCategory = category;
+
+ // remove active from all buttons
+ document.querySelectorAll('#filterButtons button')
+  .forEach(b => b.classList.remove('active'));
+
+ // mark clicked button as active
+ btn.classList.add('active');
+
+ applyFilters();
 }
 
+
+/* HELPERS */
 function copy(text){
-  navigator.clipboard.writeText(text);
-  showToast("Copied!");
+ navigator.clipboard.writeText(text);
 }
 
 function email(issueEncoded){
-
-  const issue = decodeURIComponent(issueEncoded);
-  const item = data.find(d=>d.issue===issue);
-
-  window.location.href =
-    `mailto:?subject=${item.issue}&body=${item.process}`;
-}
-
-function showToast(t){
-
-  const x = document.getElementById("toast");
-
-  x.innerText = t;
-
-  x.classList.add("show");
-
-  setTimeout(()=>x.classList.remove("show"),1500);
+ const issue=decodeURIComponent(issueEncoded);
+ const item=data.find(d=>d.issue===issue);
+ window.location.href=`mailto:?subject=${item.issue}&body=${item.process}`;
 }
 
 function toggleTheme(){
-  document.body.classList.toggle("dark");
+ document.body.classList.toggle("dark");
 }
 
-/* HIDDEN ADMIN SHORTCUT */
+/* BACK TO TOP */
+function scrollToTop(){
+ search.scrollIntoView({behavior:"smooth"});
+}
 
-document.addEventListener("keydown", e => {
+window.addEventListener("scroll",()=>{
+backToTop.style.display = window.scrollY>300 ? "block" : "none";
+``});
 
-  if (e.ctrlKey && e.shiftKey && e.key === "U") {
+/* SEARCH */
+search.addEventListener("input",applyFilters);
 
-    document.getElementById("adminPanel").style.display = "block";
-
-    document.getElementById("adminPass").focus();
-
-    showToast("Admin panel opened");
-  }
+/* ADMIN SHORTCUT */
+document.addEventListener("keydown",e=>{
+ if(e.ctrlKey && e.shiftKey && e.key==="U"){
+  adminPanel.style.display="block";
+ }
 });
 
 /* LOAD */
-
 async function load(){
-
-  const res = await fetch(
-    "https://raw.githubusercontent.com/naderlabib-afk/support-processes/refs/heads/main/processes.json?t=" + Date.now()
-  );
-
-  data = await res.json();
-
-  applyFilters();
+ const res=await fetch("https://raw.githubusercontent.com/naderlabib-afk/support-processes/refs/heads/main/processes.json");
+ data=await res.json();
+ applyFilters();
 }
-
 load();
 
 /* DOWNLOAD JSON */
-
 function downloadJSON(){
-
-  const blob = new Blob(
-    [JSON.stringify(data,null,2)],
-    {type:"application/json"}
-  );
-
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-
-  a.href = url;
-  a.download = "processes.json";
-
-  a.click();
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");
+ a.href=url;
+ a.download="processes.json";
+ a.click();
 }
 
 </script>
