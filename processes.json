@@ -90,7 +90,7 @@
     "process": "1. CRU parts always NBD\n2. SSR with parts depends on contract and shipping option\n3. If after cutoff, delivery delayed by 1 day\n4. Track parts via tracking number"
   },
   {
-    "category": "Machine Type",
+    "category": "Customer",
     "machine_type": "All",
     "issue": "Escalation to L3",
     "process": "1. Use MSD escalation template\n2. Include logs, system state, actions taken\n3. Define business impact and expected resolution time"
