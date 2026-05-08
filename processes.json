@@ -60,49 +60,49 @@
     "process": "1. Whenever you receive a case in Mahi that is identified as a Growth contract, the case must be canceled.\n2. A new case must be opened in CSP instead.\n3. No RTS time should be reported in Mahi for Growth contract cases unless it's open for escalation to L3 or for part ordering.\n4. Parts should be ordered on MSD as CRU unless there is a special handling associated to specific reason.\n5. Please note that the customer is already aware that they have a Growth contract and is required to log cases through the IBM portal, not the Lenovo portal. If needed, you may educate and reinforce this process with the customer.\n6. All RTS time must be reported accurately in CSP\n"
   },
   {
-    "category": "Machine",
+    "category": "Machine Type",
     "machine_type": "Storage DE/DM",
     "issue": "Complex Issues",
     "process": "1. Handle HDD replacement directly\n2. For complex issues, escalate to ATS\n3. Use required escalation templates"
   },
   {
-    "category": "Machine",
+    "category": "Part",
     "machine_type": "All",
     "issue": "Batteries (BBU/CMOS)",
     "process": "1. BBU not replaced, customer purchases separately\n2. CMOS treated as CRU, it's considered a consumable part - expected delivery date +2J\n3. If customer insistes to have SSR intervention, Request approval from Lenovo SDM via the OVD process - if accepted the CMOS should not be delivered in Access point.\n4. Lenovo SDM will determine whether an ONS fee applies (one case, one fee per SN) or if hourly billing should be used (in case of high volumes of SN).\n5. Proof of approval via email and the OVD file."
   },
   {
-    "category": "Machine",
+    "category": "Part",
     "machine_type": "All",
     "issue": "GPU Replacement",
     "process": "1. It is very important that everyone is fully aware of the required escalation logs needed for GPU related cases across different system types.\n2. Having the correct logs collected from the start helps us accelerate troubleshooting, reduce back and forth, and ensure smooth escalation to the next support level Updated Glosse link : (https://glosse4lenovo.lenovo.com/wiki/glosse4lenovo/view/Logs/#HGPUsystems)\n3. Please set customer expectation if PE agrees to replace the GPU there will be some time until part delivery. \n4. Case should be escalated to L3 , Must be approved by PE before replacement."
   },
   {
-    "category": "Machine",
+    "category": "Part",
     "machine_type": "All",
     "issue": "PDU Handling",
     "process": "1. Escalate to Lenovo L3/PE\n2. Wait for approval before replacement\n3. Some models excluded"
   },
   {
-    "category": "Machine",
+    "category": "Part",
     "machine_type": "All",
     "issue": "Parts Ordering",
     "process": "1. CRU parts always NBD\n2. SSR with parts depends on contract and shipping option\n3. If after cutoff, delivery delayed by 1 day\n4. Track parts via tracking number"
   },
   {
-    "category": "Special Handling",
+    "category": "Machine Type",
     "machine_type": "All",
     "issue": "Escalation to L3",
     "process": "1. Use MSD escalation template\n2. Include logs, system state, actions taken\n3. Define business impact and expected resolution time"
   },
   {
-    "category": "All",
+    "category": "Customer",
     "machine_type": "All",
     "issue": "Case Closure",
     "process": "1. Contact customer at least 3 times\n2. Send closure notification\n3. Close within 7 days if no response\n4. Record all actions in system"
   },
   {
-    "category": "Special Handling",
+    "category": "Customer",
     "machine_type": "All",
     "issue": "Case Cancellation",
     "process": "1. Require OL approval\n2. Cancel duplicates, test cases, incorrect cases\n3. Cancel not entitled or declined T&M cases\n4. review golden rule document if necessary."
@@ -114,19 +114,19 @@
     "process": "1. any case created under a country different from the server’s actual location must be canceled and re-created with the correct country.\n2. This is not limited to Drom-Com regions.\n3. Ensure the Metrics tab is checked to verify the country originally associated with the case:\n"
   },
   {
-    "category": "All",
+    "category": "Customer",
     "machine_type": "All",
     "issue": "Tips for better workflow",
     "process": "1. Handover (HO): Ensure sending HO of all your cases (MAHI / CSP in case of growth).\n2. Case Ownership: Do not reassign case ownership to any team member who is currently on annual leave.\n3. Growth Case Tracking: All growth case subjects must include the MSD reference number, and vice versa, to improve tracking and visibility.\n4. MAHI Case Titles: Please ensure MAHI case titles are properly updated and clearly reflect the case context.\n5. Customer Satisfaction (PCC Stage): If you identify any signs of customer dissatisfaction during PCC, do not close the case before consulting with Operation leader."
   },
   {
-    "category": "All",
+    "category": "Part",
     "machine_type": "All",
     "issue": "Return labels",
     "process": "Lenovo ISG has introduced a dedicated functional ID for requests related to missing return labels, including SOIDs and UPS return labels.\nPlease send all such requests to:\n📧 isgrtvreturn@lenovo.com\n"
   },
   {
-    "category": "All",
+    "category": "Customer",
     "machine_type": "All",
     "issue": "IBM RTS Golden Rules for Lenovo ISG",
     "process": "IBM RTS Golden Rules for Lenovo ISG and process specifics - This is IBM RTS golden rules for RTS agents, case ownership, documentation, communication, escalation, reporting, Cancellation guideline,  Guidance on the \"send/don´t send survey\" feature, when closing a case, Can I send a part for 1st action plan for which no part is needed, respectively can I send two parts for the 1st onsite visit etc\n\nhttps://ibm.box.com/s/216qi5kkzh0dhahpc1xasbd7eh2f69b0"
