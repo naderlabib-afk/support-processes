@@ -215,39 +215,8 @@ pre{
 
 
 
-.search-item {
- padding: 10px;
- cursor: pointer;
- border-bottom: 1px solid #eee;
-}
 
-.search-item:hover {
- background: #f1f2f6;
-}
 
-.search-dropdown {
- position: absolute;
- top: 100%;
- left: 0;
- right: 0;
- background: white;
- border-radius: 8px;
- box-shadow: 0 6px 15px rgba(0,0,0,0.15);
- max-height: 250px;
- overflow-y: auto;
- z-index: 999;
- display: none;
-}
-
-.search-item {
- padding: 10px;
- cursor: pointer;
- border-bottom: 1px solid #eee;
-}
-
-.search-item:hover {
- background: #f1f2f6;
-}
 
 </style>
 </head>
@@ -391,6 +360,8 @@ function saveProcess(){
   data.push(item);
  }
 
+
+
  applyFilters();
  renderAdminList();
  clearForm();
@@ -434,16 +405,63 @@ function editProcess(i){
 
 /* FILTER + SORT */
 
+function levenshtein(a, b) {
+ const matrix = [];
+
+ for (let i = 0; i <= b.length; i++) {
+   matrix[i] = [i];
+ }
+ for (let j = 0; j <= a.length; j++) {
+   matrix[0][j] = j;
+ }
+
+ for (let i = 1; i <= b.length; i++) {
+   for (let j = 1; j <= a.length; j++) {
+     if (b.charAt(i - 1) === a.charAt(j - 1)) {
+       matrix[i][j] = matrix[i - 1][j - 1];
+     } else {
+       matrix[i][j] = Math.min(
+         matrix[i - 1][j - 1] + 1, // substitution
+         matrix[i][j - 1] + 1,     // insertion
+         matrix[i - 1][j] + 1      // deletion
+       );
+     }
+   }
+ }
+
+ return matrix[b.length][a.length];
+}
+
+function fuzzyMatch(text, query) {
+ text = text.toLowerCase();
+ query = query.toLowerCase();
+
+ // ✅ fast exact match first (performance optimization)
+ if (text.includes(query)) return true;
+
+ // ✅ split text into words for better accuracy
+ const words = text.split(/\s+/);
+
+ // ✅ check each word
+ return words.some(word => {
+   const distance = levenshtein(word, query);
+
+   // ✅ dynamic tolerance (important)
+   const maxDistance = query.length <= 4 ? 1 : 2;
+return distance <= maxDistance;
+ });
+}
+
 function applyFilters(){
  const k=search.value.toLowerCase();
 
  let filtered=data.filter(i=>{
-  const matchSearch=
-   !k ||
-   i.issue.toLowerCase().includes(k) ||
-   i.process.toLowerCase().includes(k) ||
-   i.category.toLowerCase().includes(k) ||
-   i.machine_type.toLowerCase().includes(k);
+ const matchSearch =
+ !k ||
+ fuzzyMatch(i.issue, k) ||
+ fuzzyMatch(i.process, k) ||
+ fuzzyMatch(i.category, k) ||
+ fuzzyMatch(i.machine_type, k);
 
 let matchCat = !currentCategory || i.category === currentCategory;
 
@@ -455,9 +473,15 @@ if(currentCategory === "FAVORITES"){
  });
 
 /* ✅ Favorites first */
- filtered.sort((a,b)=>{
-  return favoritesArr.includes(b.issue) - favoritesArr.includes(a.issue);
- });
+ filtered.sort((a, b) => {
+ if (!k) return 0;
+
+ const score = (item) =>
+   levenshtein(item.issue.toLowerCase(), k);
+
+ return score(a) - score(b);
+
+});
 
  renderList(filtered,k);
  renderFavorites();
@@ -645,9 +669,11 @@ function updateSearchDropdown() {
 
  const matches = data
    .filter(i =>
-     i.issue.toLowerCase().includes(query) ||
-     i.process.toLowerCase().includes(query)
-   )
+
+fuzzyMatch(i.issue, query) ||
+fuzzyMatch(i.process, query)
+)
+
    .slice(0, 8);
 
  if (matches.length === 0) {
@@ -660,7 +686,7 @@ function updateSearchDropdown() {
  matches.forEach(item => {
    const div = document.createElement("div");
    div.className = "search-item";
-   div.textContent = item.issue;
+   div.innerHTML = `<b>${item.issue}</b><br><small>${item.category}</small>`;
 
    div.onclick = () => {
      search.value = item.issue;
