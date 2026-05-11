@@ -75,6 +75,7 @@ input,textarea,select{
 }
 
 .actions button{
+ position: relative;
  margin-right:5px;
  padding:6px 10px;
  border-radius:6px;
@@ -122,6 +123,132 @@ pre{
  border-radius:8px;
  white-space:pre-wrap;
 }
+
+/* ✅ COPY FEEDBACK STYLE (ADD HERE) */
+.copy-feedback {
+ position:absolute;
+ right:10px;
+ top:10px;
+ background:#4cd137;
+ color:white;
+ padding:3px 8px;
+ border-radius:6px;
+ font-size:12px;
+ opacity:0;
+ transition:opacity 0.3s;
+}
+.actions button::before {
+ content: "";
+ position: absolute;
+ bottom: 120%;
+ left: 50%;
+ transform: translateX(-50%);
+ border: 5px solid transparent;
+ border-top-color: #2f3640;
+ opacity: 0;
+ transition: opacity 0.2s;
+}
+
+.actions button:hover::before {
+ opacity: 1;
+}
+.actions button:hover::after {
+ opacity: 1;
+ transform: translateX(-50%) translateY(-3px);
+}
+/* ✅ CUSTOM TOOLTIP */
+.actions button::after {
+ content: attr(data-tooltip); /* pulls text dynamically */
+ position: absolute;
+ bottom: 130%; /* appears above button */
+ left: 50%;
+ transform: translateX(-50%);
+ background: #2f3640;
+ color: #fff;
+ padding: 4px 8px;
+ border-radius: 5px;
+ font-size: 11px;
+ white-space: nowrap;
+ opacity: 0;
+ pointer-events: none;
+ transition: opacity 0.2s ease;
+ z-index: 1000;
+}
+
+/* Show on hover */
+.actions button:hover::after {
+ opacity: 1;
+}
+
+.card.copied .copy-feedback {
+ opacity:1;
+}
+
+.card {
+ position:relative;
+}
+
+/* ✅ SEARCH DROPDOWN */
+.search-dropdown {
+ position: absolute;
+ top: 100%;
+ left: 0;
+ right: 0;
+ background: white;
+ border-radius: 8px;
+ box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+ max-height: 250px;
+ overflow-y: auto;
+ z-index: 999;
+ display: none;
+}
+
+.search-item {
+ padding: 10px;
+ cursor: pointer;
+ border-bottom: 1px solid #eee;
+}
+
+.search-item:hover {
+ background: #f1f2f6;
+}
+
+
+
+.search-item {
+ padding: 10px;
+ cursor: pointer;
+ border-bottom: 1px solid #eee;
+}
+
+.search-item:hover {
+ background: #f1f2f6;
+}
+
+.search-dropdown {
+ position: absolute;
+ top: 100%;
+ left: 0;
+ right: 0;
+ background: white;
+ border-radius: 8px;
+ box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+ max-height: 250px;
+ overflow-y: auto;
+ z-index: 999;
+ display: none;
+}
+
+.search-item {
+ padding: 10px;
+ cursor: pointer;
+ border-bottom: 1px solid #eee;
+}
+
+.search-item:hover {
+ background: #f1f2f6;
+}
+
 </style>
 </head>
 
@@ -134,7 +261,13 @@ pre{
 
 <div class="container">
 
-<input id="search" placeholder="Search...">
+<div style="position:relative;">
+  <input id="search" placeholder="Search...">
+  <div id="searchDropdown" class="search-dropdown"></div>
+</div>
+
+
+
 
 <div class="buttons" id="filterButtons">
  <button onclick="setFilter(this,'')">All</button>
@@ -345,9 +478,24 @@ function renderList(list,k){
   <div>${escapeHTML(i.category)} | ${escapeHTML(i.machine_type)}</div>
 
   <div class="actions">
-   <button class="email" onclick="email('${encodeURIComponent(i.issue)}')">📤</button>
-   <button class="copy" onclick="copy(\`${escapeHTML(i.process)}\`)">📋</button>
-   <button class="fav ${active}" onclick="toggleFav('${i.issue}')">⭐</button>
+   <button class="email"
+        data-tooltip="Send by email"
+        onclick="email('${encodeURIComponent(i.issue)}')">
+📤
+</button>
+   <button class="copy"
+        data-tooltip="Copy process"
+        onclick="copy(this, \`${escapeHTML(i.process)}\`)">
+📋
+</button>
+
+<div class="copy-feedback">Copied ✓</div>
+  <button class="fav ${active}"
+        data-tooltip="Add to favorites"
+        onclick="toggleFav('${i.issue}')">
+⭐
+</button>
+
   </div>
 
   <pre>${highlight(escapeHTML(i.process),k)}</pre>
@@ -400,17 +548,40 @@ function setFilter(btn, category){
 
 
 /* HELPERS */
-function copy(text){
+function copy(btn, text){
  navigator.clipboard.writeText(text);
-}
 
+ const card = btn.closest('.card');
+
+ if (!card) return; // safety check
+
+ card.classList.add("copied");
+
+ setTimeout(() => {
+  card.classList.remove("copied");
+ }, 1500);
+}
 function email(issueEncoded){
- const issue=decodeURIComponent(issueEncoded);
- const item=data.find(d=>d.issue===issue);
- window.location.href=`mailto:?subject=${item.issue}&body=${item.process}`;
-}
+ const issue = decodeURIComponent(issueEncoded);
+ const item = data.find(d => d.issue === issue);
 
-function toggleTheme(){
+ if (!item) return;
+
+ // Split lines safely (supports pasted text + Enter)
+ const lines = item.process.split(/\r?\n/);
+
+ // Keep empty lines if needed, and format bullets
+ const formatted = lines.map(line => {
+   return line.trim() ? `• ${line.trim()}` : "";
+ }).join('\r\n');
+
+ // ✅ VERY IMPORTANT: encode AFTER formatting
+ const subject = encodeURIComponent(item.issue);
+ const body = encodeURIComponent(formatted);
+
+ // ✅ Use full mailto safely
+ window.location.href = `mailto:?subject=${subject}&body=${body}`;
+}function toggleTheme(){
  document.body.classList.toggle("dark");
 }
 
@@ -423,8 +594,20 @@ window.addEventListener("scroll",()=>{
 backToTop.style.display = window.scrollY>300 ? "block" : "none";
 ``});
 
-/* SEARCH */
-search.addEventListener("input",applyFilters);
+search.addEventListener("input", () => {
+ applyFilters();
+ updateSearchDropdown();
+});
+
+document.addEventListener("click", (e) => {
+ const dropdown = document.getElementById("searchDropdown");
+
+ if (!e.target.closest("#search") && !e.target.closest("#searchDropdown")) {
+   dropdown.style.display = "none";
+ }
+});
+
+
 
 /* ADMIN SHORTCUT */
 document.addEventListener("keydown",e=>{
@@ -449,6 +632,46 @@ function downloadJSON(){
  a.href=url;
  a.download="processes.json";
  a.click();
+}
+
+function updateSearchDropdown() {
+ const dropdown = document.getElementById("searchDropdown");
+ const query = search.value.toLowerCase();
+
+ if (!query) {
+   dropdown.style.display = "none";
+   return;
+ }
+
+ const matches = data
+   .filter(i =>
+     i.issue.toLowerCase().includes(query) ||
+     i.process.toLowerCase().includes(query)
+   )
+   .slice(0, 8);
+
+ if (matches.length === 0) {
+   dropdown.style.display = "none";
+   return;
+ }
+
+ dropdown.innerHTML = "";
+
+ matches.forEach(item => {
+   const div = document.createElement("div");
+   div.className = "search-item";
+   div.textContent = item.issue;
+
+   div.onclick = () => {
+     search.value = item.issue;
+     dropdown.style.display = "none";
+     applyFilters();
+   };
+
+   dropdown.appendChild(div);
+ });
+
+ dropdown.style.display = "block";
 }
 
 </script>
