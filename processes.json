@@ -60,10 +60,10 @@
     "process": "1. Whenever you receive a case in Mahi that is identified as a Growth contract, the case must be canceled.\n2. A new case must be opened in CSP instead.\n3. No RTS time should be reported in Mahi for Growth contract cases unless it's open for escalation to L3 or for part ordering.\n4. Parts should be ordered on MSD as CRU unless there is a special handling associated to specific reason.\n5. Please note that the customer is already aware that they have a Growth contract and is required to log cases through the IBM portal, not the Lenovo portal. If needed, you may educate and reinforce this process with the customer.\n6. All RTS time must be reported accurately in CSP\n"
   },
   {
-    "category": "Machine Type",
-    "machine_type": "Storage DE/DM",
-    "issue": "Complex Issues",
-    "process": "1. Handle HDD replacement directly\n2. For complex issues, escalate to ATS\n3. Use required escalation templates"
+    "category": "Part",
+    "machine_type": "All",
+    "issue": "Tracking parts",
+    "process": "Tracking parts on UPS site:\n\nNBD - https://www.ups.com/us/en/home\n\nSBD - https://splus.ups.com/cfw/trackOrder.action\n"
   },
   {
     "category": "Part",
@@ -136,5 +136,23 @@
     "machine_type": "All",
     "issue": "ISDM special handling",
     "process": "1.\tAlways communicate by email (unless customer requests phone communication)\n2.\tAlways keep email history in communication\n3.\tIf power / temperature issue, always check with customer if they encountered any issue with CDU (if case needs L3 assistance, always inform L3 of CDU installation)\n4.\tNever request customer to confirm asset location. All machines are hosted in CINES datacenter (CINES - 950 rue St Priest - 34090 Montpellier – France) Local contact : Jean-Luc OMS - 06 32 01 04 17\n5.\tSSR needs to have ZRR accreditation (RMC has approved list)"
+  },
+  {
+    "category": "Customer",
+    "machine_type": "All",
+    "issue": "SOCIETE GENERALE TRUSCALE",
+    "process": "1. Communication & Contacts\n\nOOH team must contact the France standby agent to handle the case.\nAll communication must be in English via email:\n\n📧 lenovosoge@lenovo.com\n\n\nAccess authorization requests:\n\nGraham Boxall (gboxall@lenovo.com)\nWeronika Grzeda (wgrzeda@lenovo.com)\n\n\nNote: 24h access is always requested by Lenovo\n\n\n2. Troubleshooting & Work Orders\n\nLenovo onsite team performs L1 troubleshooting.\nRTS can create a work order without logs if Lenovo requests a specific FRU.\nDo NOT recommend firmware updates unless requested by L3/PE. \n\n\n3. Site & Access Rules\n\nLocation:\n\nInterxion PAR 7\nRoom: 1.R111.0 / Cage: 1.R111.D\n1-3 rue Rateau, 93120 La Courneuve, France\n\n\nControl Center must NOT ask for server location. \n\n4. Parts Handling & Delivery\n\nSSR must collect parts from PUDO (direct delivery = exception only).\n\nOrdering Rules\n\nBefore 4 PM (cut-off):\n\nUse NBD → delivery to AccPt (La Courneuve)\n\n\nAfter cut-off / weekends / holidays:\n\nUse SBD → delivery to FSL (Rungis)\n\n\nSev1 cases (production down):\n\nAlways SBD → FSL Rungis [SOCIETE GE...E TRUSCALE | Word]\n\n\n\n\n5. Preferred SSRs (Permanent Access)\n\n# Pierre Fernandes - pierrefernandes@fr.ibm.com +336 60 57 18 00  (permanent access, no access request required) \n# Leang Houy Kech - Leang-Houy_Kech@fr.ibm.com +336 07 18 54 05 (permanent access, no access request required) \n# Quan Trung Le - TLQUAN@fr.ibm.com -  +33 6 60 63 63 71 (permanent access, no access request required)\n# Pascal Flamigni - FLAMIGNP@fr.ibm.com - +336 70 77 83 59  (permanent access, no access request required)\n\n\n6. SLA\n\nAll machines covered under 24x7 / 4-hour SLA"
+  },
+  {
+    "category": "Customer",
+    "machine_type": "All",
+    "issue": "SOCIETE GENERALE – BYTEDANCE (TIKTOK)",
+    "process": "1. Location\n\nSite: Interxion PAR3 (PARIS ITX)\nAddress: 7–9 Avenue des Arts et Métiers, 93200 Saint-Denis, France \n\n\n2. Work Order & Parts Handling\n\nCreate Labor-only WO in MSD (for scheduling only).\nDO NOT order parts in MSD → Use:\n\nhttps://commercial.lenovo.com/us/en/partsordering\n\n\nWO must clearly state:\n\nParts will be shipped directly to customer site from another platform.\n\n\nParts must always be delivered to:\n\nPARIS ITX – Interxion PAR3 \n\n\n\n\n3. Access & Support\n\nFirst-time users need Operations Leader (Nader Labib) for:\n\nPortal access\nTraining\n\n\nLenovo escalation/contact:\n\nZebada Leung (lzebada@lenovo.com / +852 6077 7417)\n\n\nZebada supports RTS & RMC for access issues. \n\n\n4. Critical Rules\n\nDisks must stay with the customer.\nSSR must take photos of serial numbers:\n\nOld disk\nNew disk\n\n\nPhotos must be sent to Zebada.\nMachines are not visible in GLOSSE (confidential / restricted hyperscale servers). \n\n\n5. Preferred SSRs\n\nLeang Houy Kech\nPierre Fernandes"
+  },
+  {
+    "category": "Contract",
+    "machine_type": "ALL",
+    "issue": "Important Links",
+    "process": "MSD - https://lenovo-dcgcontactcenter-prod.crm.dynamics.com/main.aspx\n\nWarranty Lookup - https://datacentersupport.lenovo.com/eg/en/warranty-lookup#/\n\nCSP - https://ibmsf.lightning.force.com/lightning/page/home\n\nLenovo Upload Tool - https://logupload.lenovo.com/\n\nLenovo service Systems care - https://servicetools.lenovo.com/\n\nGlosse for Lenovo - https://glosse4lenovo.lenovo.com/wiki/glosse4lenovo/view/GLOSSE%204%20Lenovo/\n\nGLOSSE 4 Lenovo (PE Corner) - https://glosse4lenovo.lenovo.com/wiki/glosse4pecorner/view/%20Welcome%20to%20GLOSSE%204%20Lenovo%20PE%20Corner/\n\nRedmine - https://hpc.lenovo.com/hio9oobo/projects/soc-gen\n\nHyper scale parts ordering (TikTok) = Lenovo Service Connect - https://serviceconnect.lenovo.com\n\nEcurep - https://ecurep.mainz.de.ibm.com/ae5/\n\nClient Care Eticket Form = for creating complain - https://datacentersupport.lenovo.com/eg/en/clientcareticket\n\nParts availability - https://app.powerbi.com/groups/me/reports/e1e31db6-5f0c-467c-b0ff-e5605c4ea46b/ReportSection69bde29e37160371d087?ctid=5c7d0b28-bdf8-410c-aa93-4df372b16203&experience=power-bi\n\nLenovo End of Service Date Lookup for Servers/Storage/Networking products - https://support.lenovo.com/us/en/solutions/ht504708-lenovo-end-of-service-dates-for-serversstoragenetworking-products\n"
   }
 ]
